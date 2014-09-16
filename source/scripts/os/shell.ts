@@ -326,7 +326,7 @@ module TSOS {
         }
 
         public shellSchrodinger(args) {
-            if (args === "look") {
+            if (args[0] === "look") {
                 var life = Math.random();
                 // Life gets the slightest of an advantage in this duality because, well, I'm an optimist.
                 if (life >= .5) {
@@ -336,7 +336,7 @@ module TSOS {
                     _StdOut.putText("It's... not so alive.");
                 }
             }
-            else if (args === "nolook") {
+            else if (args[0] === "nolook") {
                 _StdOut.putText("Dead/Alive... Look in the box!");
             }
             else {

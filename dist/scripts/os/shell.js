@@ -305,7 +305,7 @@ var TSOS;
         };
 
         Shell.prototype.shellSchrodinger = function (args) {
-            if (args === "look") {
+            if (args[0] === "look") {
                 var life = Math.random();
 
                 // Life gets the slightest of an advantage in this duality because, well, I'm an optimist.
@@ -314,7 +314,7 @@ var TSOS;
                 } else {
                     _StdOut.putText("It's... not so alive.");
                 }
-            } else if (args === "nolook") {
+            } else if (args[0] === "nolook") {
                 _StdOut.putText("Dead/Alive... Look in the box!");
             } else {
                 _StdOut.putText("To look or not to look in the box... That is the question.");
