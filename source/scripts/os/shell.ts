@@ -9,6 +9,7 @@
    ------------ */
 
 // TODO: Write a base class / prototype for system services and let Shell inherit from it.
+// test
 
 module TSOS {
     export class Shell {
@@ -73,6 +74,24 @@ module TSOS {
             sc = new ShellCommand(this.shellPrompt,
                                   "prompt",
                                   "<string> - Sets the prompt.");
+            this.commandList[this.commandList.length] = sc;
+
+            // date
+            sc = new ShellCommand(this.shellDate,
+                                  "date",
+                                  "- Displays the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+
+            // whereami
+            sc = new ShellCommand(this.shellWhereAmI,
+                                  "whereami",
+                                  "- Self-Explanatory... Displays where you are.");
+            this.commandList[this.commandList.length] = sc;
+
+            // schrodinger <string>
+            sc = new ShellCommand(this.shellSchrodinger,
+                                  "schrodinger",
+                                  "<look | nolook> - Dead or Alive?.");
             this.commandList[this.commandList.length] = sc;
 
             // processes - list the running processes and their IDs
@@ -199,7 +218,7 @@ module TSOS {
         }
 
         public shellVer(args) {
-            _StdOut.putText(APP_NAME + " version " + APP_VERSION);
+            _StdOut.putText(APP_NAME + ": version \"Latest and Greatest\"");
         }
 
         public shellHelp(args) {
@@ -276,6 +295,52 @@ module TSOS {
                 _OsShell.promptStr = args[0];
             } else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
+            }
+        }
+
+        public shellDate() {
+            var currDate = new Date();
+            var currDay = currDate.getDate();
+            var currMonth = currDate.getMonth() + 1;
+            var currYear = currDate.getFullYear();
+
+            var currTimeHr = currDate.getHours();
+            var currTimeMin = currDate.getMinutes();
+            var currAMvPM = "AM";
+
+            if (currTimeHr === 0) {
+                currTimeHr = 12;
+            }
+
+            if (currTimeHr > 11){
+                currAMvPM = "PM";
+                if (currTimeHr > 12) {
+                    currTimeHr = currTimeHr % 12;
+                }
+            }
+            _StdOut.putText(currMonth + "/" + currDay + "/" + currYear + " " + currTimeHr + ":" + currTimeMin + " " + currAMvPM);
+        }
+
+        public shellWhereAmI() {
+            _StdOut.putText("\"PANAMAAAAAAAAAAAA!\" - David Lee Roth");
+        }
+
+        public shellSchrodinger(args) {
+            if (args === "look") {
+                var life = Math.random();
+                // Life gets the slightest of an advantage in this duality because, well, I'm an optimist.
+                if (life >= .5) {
+                    _StdOut.putText("It's ALIVE!!!");
+                }
+                else {
+                    _StdOut.putText("It's... not so alive.");
+                }
+            }
+            else if (args === "nolook") {
+                _StdOut.putText("Dead/Alive... Look in the box!");
+            }
+            else {
+                _StdOut.putText("To look or not to look in the box... That is the question.");
             }
         }
 
