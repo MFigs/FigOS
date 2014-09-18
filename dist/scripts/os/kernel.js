@@ -35,6 +35,12 @@ var TSOS;
                 var cTimeMin = cDate.getMinutes();
                 var cAMvPM = "AM";
 
+                if (cTimeMin < 10) {
+                    var cTimeMinStr = "0" + cTimeMin;
+                } else {
+                    var cTimeMinStr = "" + cTimeMin;
+                }
+
                 if (cTimeHr === 0) {
                     cTimeHr = 12;
                 }
@@ -46,7 +52,7 @@ var TSOS;
                     }
                 }
 
-                var dateTimeString = cMonth + "/" + cDay + "/" + cYear + " " + cTimeHr + ":" + cTimeMin + " " + cAMvPM;
+                var dateTimeString = cMonth + "/" + cDay + "/" + cYear + " " + cTimeHr + ":" + cTimeMinStr + " " + cAMvPM;
                 document.getElementById("dateTimeOutput").innerHTML = dateTimeString;
                 document.getElementById("statusOutput").innerHTML = _Status;
             }, 1000);
