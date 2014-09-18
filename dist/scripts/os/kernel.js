@@ -25,6 +25,32 @@ var TSOS;
             // Initialize the console.
             _Console.init();
 
+            setInterval(function () {
+                var cDate = new Date();
+                var cDay = cDate.getDate();
+                var cMonth = cDate.getMonth() + 1;
+                var cYear = cDate.getFullYear();
+
+                var cTimeHr = cDate.getHours();
+                var cTimeMin = cDate.getMinutes();
+                var cAMvPM = "AM";
+
+                if (cTimeHr === 0) {
+                    cTimeHr = 12;
+                }
+
+                if (cTimeHr > 11) {
+                    cAMvPM = "PM";
+                    if (cTimeHr > 12) {
+                        cTimeHr = cTimeHr % 12;
+                    }
+                }
+
+                var dateTimeString = cMonth + "/" + cDay + "/" + cYear + " " + cTimeHr + ":" + cTimeMin + " " + cAMvPM;
+                document.getElementById("dateTimeOutput").innerHTML = dateTimeString;
+                document.getElementById("statusOutput").innerHTML = _Status;
+            }, 1000);
+
             // Initialize standard input and output to the _Console.
             _StdIn = _Console;
             _StdOut = _Console;

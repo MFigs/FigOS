@@ -84,7 +84,12 @@ module TSOS {
                                      _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                                      _FontHeightMargin;
 
-            // TODO: Handle scrolling. (Project 1)
+            // Shift the canvas up when text/shell commands drop below the canvas
+            while (this.currentYPosition > _Canvas.height) {
+                var canImg = _DrawingContext.getImageData(0, this.currentFontSize, 500, 561);
+                _DrawingContext.putImageData(canImg, 0, 0);
+                this.currentYPosition -= this.currentFontSize;
+            }
         }
     }
  }

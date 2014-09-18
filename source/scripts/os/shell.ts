@@ -94,6 +94,18 @@ module TSOS {
                                   "<look | nolook> - Dead or Alive?.");
             this.commandList[this.commandList.length] = sc;
 
+            //status <string>
+            sc = new ShellCommand(this.shellStatus,
+                                  "status",
+                                  "<string> - Allows user to change OS status display.");
+            this.commandList[this.commandList.length] = sc;
+
+            //load <string>
+            sc = new ShellCommand(this.shellLoad,
+                "load",
+                "<string> - Allows user to load a program in 6502a op codes via the User Program Input section of the GUI.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -218,7 +230,7 @@ module TSOS {
         }
 
         public shellVer(args) {
-            _StdOut.putText(APP_NAME + ": version \"Latest and Greatest\"");
+            _StdOut.putText(APP_NAME + ": version " + APP_VERSION + " \"Latest and Greatest\"");
         }
 
         public shellHelp(args) {
@@ -308,6 +320,13 @@ module TSOS {
             var currTimeMin = currDate.getMinutes();
             var currAMvPM = "AM";
 
+            if (currTimeMin < 10) {
+                var currTimeMinStr = "0" + currTimeMin;
+            }
+            else {
+                var currTimeMinStr = "" + currTimeMin;
+            }
+
             if (currTimeHr === 0) {
                 currTimeHr = 12;
             }
@@ -318,7 +337,7 @@ module TSOS {
                     currTimeHr = currTimeHr % 12;
                 }
             }
-            _StdOut.putText(currMonth + "/" + currDay + "/" + currYear + " " + currTimeHr + ":" + currTimeMin + " " + currAMvPM);
+            _StdOut.putText(currMonth + "/" + currDay + "/" + currYear + " " + currTimeHr + ":" + currTimeMinStr + " " + currAMvPM);
         }
 
         public shellWhereAmI() {
@@ -341,6 +360,18 @@ module TSOS {
             }
             else {
                 _StdOut.putText("To look or not to look in the box... That is the question.");
+            }
+        }
+
+        public shellStatus(args) {
+            if (args[0].length > 0) {
+                _Status = args[0];
+            }
+        }
+
+        public shellLoad(args) {
+            if(args[0].length > 0) {
+
             }
         }
 

@@ -2,10 +2,10 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-   <meta name="author"             content="Alan G. Labouseur" />
+   <meta name="author"             content="Michael Figueiredo and Alan G. Labouseur" />
    <link rel="stylesheet" href="dist/styles/tsos.css" type="text/css" media="screen" />
    <title>
-      TSOS - a browser-based virtual Operating System in TypeScript
+      FigOS - a browser-based virtual Operating System in TypeScript
    </title>
 
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
@@ -66,10 +66,18 @@
              onclick="TSOS.Control.hostBtnReset_click(this);">
    </div>
 
-   <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+   <div id="statusBar" style="margin:4px">
+      <br>
+         <b>Date/Time: </b><span id="dateTimeOutput"></span>
+      <br>
+         <b>Status: </b><span id="statusOutput"></span>
+   </div>
+
+
+   <div id="divConsole" style="margin:4px; width:500px; height:561px; float:left;">
       <canvas id="display"
               width="500px"
-              height="500px"
+              height="561px"
               tabindex="3">
       </canvas>
    </div>

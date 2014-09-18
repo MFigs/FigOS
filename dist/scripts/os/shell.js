@@ -66,6 +66,14 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellSchrodinger, "schrodinger", "<look | nolook> - Dead or Alive?.");
             this.commandList[this.commandList.length] = sc;
 
+            //status <string>
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Allows user to change OS status display.");
+            this.commandList[this.commandList.length] = sc;
+
+            //load <string>
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<string> - Allows user to load a program in 6502a op codes via the User Program Input section of the GUI.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -196,7 +204,7 @@ var TSOS;
         };
 
         Shell.prototype.shellVer = function (args) {
-            _StdOut.putText(APP_NAME + ": version \"Latest and Greatest\"");
+            _StdOut.putText(APP_NAME + ": version " + APP_VERSION + " \"Latest and Greatest\"");
         };
 
         Shell.prototype.shellHelp = function (args) {
@@ -287,6 +295,12 @@ var TSOS;
             var currTimeMin = currDate.getMinutes();
             var currAMvPM = "AM";
 
+            if (currTimeMin < 10) {
+                var currTimeMinStr = "0" + currTimeMin;
+            } else {
+                var currTimeMinStr = "" + currTimeMin;
+            }
+
             if (currTimeHr === 0) {
                 currTimeHr = 12;
             }
@@ -297,7 +311,7 @@ var TSOS;
                     currTimeHr = currTimeHr % 12;
                 }
             }
-            _StdOut.putText(currMonth + "/" + currDay + "/" + currYear + " " + currTimeHr + ":" + currTimeMin + " " + currAMvPM);
+            _StdOut.putText(currMonth + "/" + currDay + "/" + currYear + " " + currTimeHr + ":" + currTimeMinStr + " " + currAMvPM);
         };
 
         Shell.prototype.shellWhereAmI = function () {
@@ -318,6 +332,17 @@ var TSOS;
                 _StdOut.putText("Dead/Alive... Look in the box!");
             } else {
                 _StdOut.putText("To look or not to look in the box... That is the question.");
+            }
+        };
+
+        Shell.prototype.shellStatus = function (args) {
+            if (args[0].length > 0) {
+                _Status = args[0];
+            }
+        };
+
+        Shell.prototype.shellLoad = function (args) {
+            if (args[0].length > 0) {
             }
         };
         return Shell;
