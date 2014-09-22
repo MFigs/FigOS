@@ -18,6 +18,8 @@ module TSOS {
         public commandList = [];
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
+        public commandHistory = [];
+        public commandPointer = 0;
 
         constructor() {
 
@@ -106,6 +108,12 @@ module TSOS {
                 "<string> - Allows user to load a program in 6502a op codes via the User Program Input section of the GUI.");
             this.commandList[this.commandList.length] = sc;
 
+            //bsod
+            sc = new ShellCommand(this.shellBSOD,
+                "bsod",
+                "- Displays blue screen error message that is shown when a kernel error occurs.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -123,6 +131,8 @@ module TSOS {
             //
             // Parse the input...
             //
+            this.commandHistory[this.commandHistory.length] = buffer;
+            this.commandPointer = this.commandHistory.length;
             var userCommand = new UserCommand();
             userCommand = this.parseInput(buffer);
             // ... and assign the command and args to local variables.
@@ -373,6 +383,10 @@ module TSOS {
             if(args[0].length > 0) {
 
             }
+        }
+
+        public shellBSOD() {
+            _Console.displayBSOD("test");
         }
 
     }

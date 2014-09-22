@@ -18,6 +18,45 @@ module TSOS {
             super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
         }
 
+
+        static symbolCharCodeASCIIMatch: {[keycode: number] : number;} = {
+        186 : 59, //;
+        187 : 61, //=
+        188 : 44, //,
+        189 : 45, //-
+        190 : 46, //.
+        191 : 47, ///
+        192 : 96, //`
+        219 : 91, //[
+        220 : 92, //\
+        221 : 93, //]
+        222 : 39  //'
+        };
+
+        static symbolCharCodeASCIIMatchShift: {[keycode: number] : number;} = {
+        48 : 41,   //)
+        49 : 33,   //!
+        50 : 64,   //@
+        51 : 35,   //#
+        52 : 36,   //$
+        53 : 37,   //%
+        54 : 94,   //^
+        55 : 38,   //&
+        56 : 42,   //*
+        57 : 40,   //(
+        186 : 58,  //:
+        187 : 43,  //+
+        188 : 60,  //<
+        189 : 95,  //_
+        190 : 62,  //>
+        191 : 63,  //?
+        192 : 126, //~
+        219 : 123, //{
+        220 : 124, //|
+        221 : 125, //}
+        222 : 34   //"
+        };
+
         public krnKbdDriverEntry() {
             // Initialization routine for this, the kernel-mode Keyboard Device Driver.
             this.status = "loaded";
@@ -27,6 +66,8 @@ module TSOS {
         public krnKbdDispatchKeyPress(params) {
             // Parse the params.    TODO: Check that they are valid and osTrapError if not.
             var keyCode = params[0];
+            //_StdOut.putText("Key Code: " + params[0]);
+            //_StdOut.advanceLine();
             var isShifted = params[1];
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
             var chr = "";
@@ -48,11 +89,14 @@ module TSOS {
                         (keyCode == 13)) {                       // enter
                 chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
-              //else {
-              //      String.fromCharCode(keyCode)
-              //    }
-
             }
+            else if ((keyCode == 38) || (keyCode == 40)) {
+                _Console.scrollPrevCommands(keyCode);
+            }
+            else if (keyCode == 8) {
+                _Console.backspace();
+            }
+
         }
     }
 }

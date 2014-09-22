@@ -16,6 +16,8 @@ var TSOS;
             this.commandList = [];
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";
+            this.commandHistory = [];
+            this.commandPointer = 0;
         }
         Shell.prototype.init = function () {
             var sc = null;
@@ -74,6 +76,10 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellLoad, "load", "<string> - Allows user to load a program in 6502a op codes via the User Program Input section of the GUI.");
             this.commandList[this.commandList.length] = sc;
 
+            //bsod
+            sc = new TSOS.ShellCommand(this.shellBSOD, "bsod", "- Displays blue screen error message that is shown when a kernel error occurs.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -91,6 +97,8 @@ var TSOS;
             //
             // Parse the input...
             //
+            this.commandHistory[this.commandHistory.length] = buffer;
+            this.commandPointer = this.commandHistory.length;
             var userCommand = new TSOS.UserCommand();
             userCommand = this.parseInput(buffer);
 
@@ -344,6 +352,10 @@ var TSOS;
         Shell.prototype.shellLoad = function (args) {
             if (args[0].length > 0) {
             }
+        };
+
+        Shell.prototype.shellBSOD = function () {
+            _Console.displayBSOD("test");
         };
         return Shell;
     })();

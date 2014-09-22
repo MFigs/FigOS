@@ -65,10 +65,15 @@ module TSOS {
             // decided to write one function and use the term "text" to connote string or char.
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             if (text !== "") {
+                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+                if (text.length = 1) {
+                    if ((this.currentXPosition + offset) > _Canvas.width) {
+                        this.advanceLine();
+                    }
+                }
                 // Draw the text at the current X and Y coordinates.
                 _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
                 // Move the current X position.
-                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
             }
          }
@@ -90,6 +95,45 @@ module TSOS {
                 _DrawingContext.putImageData(canImg, 0, 0);
                 this.currentYPosition -= this.currentFontSize;
             }
+        }
+
+        public displayBSOD(msg): void {
+            _StdOut.putText("KERNEL ERROR: " + msg);
+            //_DrawingContext.rect(0, 0, _Canvas.width, _Canvas.height);
+            //_DrawingContext.fillStyle="#0000FF";
+            //_DrawingContext.fill();
+
+        }
+
+        public scrollPrevCommands(keycode): void {
+            if (keycode === 38) {
+                _Console.buffer = "";
+                _DrawingContext.clearRect(0, this.currentYPosition, _Canvas.width, this.currentFontSize);
+                _StdOut.putPrompt();
+                if (_OsShell.commandPointer <= 0) {
+                    _StdOut.putText(_OsShell.commandHistory[0]);
+                }
+                else {
+                    _StdOut.putText(_OsShell.commandHistory[_OsShell.commandPointer]);
+                    _OsShell.commandPointer -= 1;
+                }
+            }
+            else {
+                _Console.buffer = "";
+                _DrawingContext.clearRect(0, this.currentYPosition, _Canvas.width, this.currentFontSize);
+                _StdOut.putPrompt();
+                if (_OsShell.commandPointer >= _OsShell.commandHistory.length) {
+                    _StdOut.putText(_OsShell.commandHistory[_OsShell.commandHistory.length]);
+                }
+                else {
+                    _StdOut.putText(_OsShell.commandHistory[_OsShell.commandPointer]);
+                    _OsShell.commandPointer += 1;
+                }
+            }
+        }
+
+        public backspace() {
+
         }
     }
  }
