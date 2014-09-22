@@ -14,12 +14,13 @@
 module TSOS {
     export class Shell {
         // Properties
-        public promptStr = ">";
+        //public promptStr = ">";
         public commandList = [];
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
-        public commandHistory = [];
+        public commandHistory: string[] = [];
         public commandPointer = 0;
+        public commandPlacerCount = 0;
 
         constructor() {
 
@@ -123,7 +124,7 @@ module TSOS {
         }
 
         public putPrompt() {
-            _StdOut.putText(this.promptStr);
+            _StdOut.putText(_PromptStr);
         }
 
         public handleInput(buffer) {
@@ -131,8 +132,11 @@ module TSOS {
             //
             // Parse the input...
             //
-            this.commandHistory[this.commandHistory.length] = buffer;
-            this.commandPointer = this.commandHistory.length;
+            this.commandHistory[this.commandPlacerCount] = buffer;
+            //_StdOut.putText("Array Content: " + this.commandHistory[this.commandPlacerCount]);
+            this.commandPointer = this.commandPlacerCount;
+            //_StdOut.putText("Pointer at: " + this.commandPointer);
+            this.commandPlacerCount++;
             var userCommand = new UserCommand();
             userCommand = this.parseInput(buffer);
             // ... and assign the command and args to local variables.
@@ -315,7 +319,7 @@ module TSOS {
 
         public shellPrompt(args) {
             if (args.length > 0) {
-                _OsShell.promptStr = args[0];
+                _PromptStr = args[0];
             } else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
@@ -387,7 +391,7 @@ module TSOS {
         }
 
         public shellBSOD() {
-            _Console.displayBSOD("test");
+            _Console.displayBSOD("This is an example BSOD error message");
         }
 
     }

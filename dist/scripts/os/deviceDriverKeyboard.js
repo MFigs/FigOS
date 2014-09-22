@@ -54,14 +54,14 @@ var TSOS;
 
                 // TODO: Check for caps-lock and handle as shifted if so.
                 _KernelInputQueue.enqueue(chr);
-            } else if (((keyCode >= 48) && (keyCode <= 57)) || (keyCode == 32) || (keyCode == 13)) {
+            } else if (((keyCode >= 48) && (keyCode <= 57) && (!isShifted)) || (keyCode === 32) || (keyCode === 13)) {
                 chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
-            } else if ((keyCode == 38) || (keyCode == 40)) {
+            } else if ((keyCode === 38) || (keyCode === 40)) {
                 _Console.scrollPrevCommands(keyCode);
-            } else if (keyCode == 8) {
+            } else if (keyCode === 8) {
                 _Console.backspace();
-            } else if (keyCode == 9) {
+            } else if (keyCode === 9) {
                 _Console.tabComplete();
             }
             //else if (((keyCode >= 186) && (keyCode <= 192)) || ((keyCode >= 219) && (keyCode <= 222)) || ((keyCode >= 48) && (keyCode <= 57) && (isShifted))){

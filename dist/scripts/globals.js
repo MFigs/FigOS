@@ -68,3 +68,4 @@ var onDocumentLoad = function () {
 
 var _Status = "good";
 var _TabIndex = 0;
+var _PromptStr = ">";

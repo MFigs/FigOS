@@ -12,12 +12,13 @@ var TSOS;
     var Shell = (function () {
         function Shell() {
             // Properties
-            this.promptStr = ">";
+            //public promptStr = ">";
             this.commandList = [];
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";
             this.commandHistory = [];
             this.commandPointer = 0;
+            this.commandPlacerCount = 0;
         }
         Shell.prototype.init = function () {
             var sc = null;
@@ -88,7 +89,7 @@ var TSOS;
         };
 
         Shell.prototype.putPrompt = function () {
-            _StdOut.putText(this.promptStr);
+            _StdOut.putText(_PromptStr);
         };
 
         Shell.prototype.handleInput = function (buffer) {
@@ -97,8 +98,13 @@ var TSOS;
             //
             // Parse the input...
             //
-            this.commandHistory[this.commandHistory.length] = buffer;
-            this.commandPointer = this.commandHistory.length;
+            this.commandHistory[this.commandPlacerCount] = buffer;
+
+            //_StdOut.putText("Array Content: " + this.commandHistory[this.commandPlacerCount]);
+            this.commandPointer = this.commandPlacerCount;
+
+            //_StdOut.putText("Pointer at: " + this.commandPointer);
+            this.commandPlacerCount++;
             var userCommand = new TSOS.UserCommand();
             userCommand = this.parseInput(buffer);
 
@@ -288,7 +294,7 @@ var TSOS;
 
         Shell.prototype.shellPrompt = function (args) {
             if (args.length > 0) {
-                _OsShell.promptStr = args[0];
+                _PromptStr = args[0];
             } else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
@@ -356,7 +362,7 @@ var TSOS;
         };
 
         Shell.prototype.shellBSOD = function () {
-            _Console.displayBSOD("test");
+            _Console.displayBSOD("This is an example BSOD error message");
         };
         return Shell;
     })();
