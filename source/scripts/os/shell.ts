@@ -156,6 +156,7 @@ module TSOS {
             }
             if (found) {
                 this.execute(fn, args);
+                _TabIndex = 0;
             } else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
                 if (this.curses.indexOf("[" + Utils.rot13(cmd) + "]") >= 0) {     // Check for curses. {

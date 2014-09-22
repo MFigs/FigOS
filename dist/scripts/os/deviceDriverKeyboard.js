@@ -19,6 +19,12 @@ var TSOS;
             // Override the base method pointers.
             _super.call(this, this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
         }
+        //public findASCIIFromKeyCodeShift(keycode): number {
+        //    return symbolCharCodeASCIIMatchShift[keycode];
+        //}
+        //public findASCIIFromKeyCode(keycode): number {
+        //    return symbolCharCodeASCIIMatch[keycode];
+        //}
         DeviceDriverKeyboard.prototype.krnKbdDriverEntry = function () {
             // Initialization routine for this, the kernel-mode Keyboard Device Driver.
             this.status = "loaded";
@@ -55,7 +61,19 @@ var TSOS;
                 _Console.scrollPrevCommands(keyCode);
             } else if (keyCode == 8) {
                 _Console.backspace();
+            } else if (keyCode == 9) {
+                _Console.tabComplete();
             }
+            //else if (((keyCode >= 186) && (keyCode <= 192)) || ((keyCode >= 219) && (keyCode <= 222)) || ((keyCode >= 48) && (keyCode <= 57) && (isShifted))){
+            //    if (isShifted) {
+            //        chr = String.fromCharCode(this.findASCIIFromKeyCodeShift(keyCode));
+            //        _KernelInputQueue.enqueue(chr);
+            //    }
+            //    else {
+            //        chr = String.fromCharCode(this.findASCIIFromKeyCode(keyCode));
+            //        _KernelInputQueue.enqueue(chr);
+            //    }
+            //}
         };
         DeviceDriverKeyboard.symbolCharCodeASCIIMatch = {
             186: 59,

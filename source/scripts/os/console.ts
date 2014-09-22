@@ -57,24 +57,29 @@ module TSOS {
             }
         }
 
-        public putText(text): void {
+        public putText(inText): void {
             // My first inclination here was to write two functions: putChar() and putString().
             // Then I remembered that JavaScript is (sadly) untyped and it won't differentiate
             // between the two.  So rather than be like PHP and write two (or more) functions that
             // do the same thing, thereby encouraging confusion and decreasing readability, I
             // decided to write one function and use the term "text" to connote string or char.
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
-            if (text !== "") {
-                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                if (text.length = 1) {
+            if (inText !== "") {
+                var splitText = inText.split("");
+                var index = 0;
+                var text = splitText[index];
+                while(index < inText.length) {
+                    var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                     if ((this.currentXPosition + offset) > _Canvas.width) {
                         this.advanceLine();
                     }
+                    // Draw the text at the current X and Y coordinates.
+                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
+                    // Move the current X position.
+                    this.currentXPosition = this.currentXPosition + offset;
+                    index++;
+                    text = splitText[index];
                 }
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                // Move the current X position.
-                this.currentXPosition = this.currentXPosition + offset;
             }
          }
 
@@ -133,7 +138,35 @@ module TSOS {
         }
 
         public backspace() {
+            // Remove most recent character from input buffer
+            var bufferRemains = (_Console.buffer).substr(0, (_Console.buffer.length - 2));
+            var bufferTailChar = (_Console.buffer).substr((_Console.buffer.length - 1), (_Console.buffer.length - 1));
+            _Console.buffer = bufferRemains;
 
+            // Clear character from screen
+            _DrawingContext.clearRect(this.currentXPosition - _DrawingContext.measureText(bufferTailChar), this.currentYPosition, _DrawingContext.measureText(bufferTailChar), this.currentFontSize);
+            this.currentXPosition = this.currentXPosition - _DrawingContext.measureText(bufferTailChar);
+        }
+
+        public tabComplete() {
+            var partialInput = _Console.buffer;
+            //var index = 0;
+            var found = false;
+            while (!found && _TabIndex < _OsShell.commandList.length) {
+                if ((_OsShell.commandList[_TabIndex].command).substr(0, partialInput.length - 1) === partialInput) {
+                    found = true;
+                    _Console.buffer = _OsShell.commandList[_TabIndex].command;
+                    _Console.currentXPosition = 0;
+                    _DrawingContext.clearRect(0, this.currentYPosition, _Canvas.width, this.currentFontSize);
+                    _StdOut.putPrompt();
+                    _StdOut.putText(_Console.buffer);
+                } else {
+                    ++_TabIndex;
+                }
+            }
+            if (found) {
+                //this.execute();
+            }
         }
     }
  }
