@@ -111,13 +111,16 @@ module TSOS {
         }
 
         public scrollPrevCommands(keycode): void {
-            if (keycode === 38) {
-                //_StdOut.putText("up: " + _OsShell.commandHistory[_OsShell.commandPointer]);
+            if (keycode === 38) {   // If up key is pushed...
+                // Clear buffer and current line of scree, reset x position and reprint prompt
                 _Console.buffer = "";
                 _DrawingContext.clearRect(0, this.currentYPosition - this.currentFontSize, _Canvas.width, this.currentFontSize + 1);
                 this.currentXPosition = 0;
                 _StdOut.putText(_PromptStr);
+
+                // Checking if going beyond oldest-called command, if show display oldest
                 if (_OsShell.commandPointer <= 0) {
+                    _OsShell.commandPointer = 0;
                     _Console.buffer = _OsShell.commandHistory[0];
                     _StdOut.putText(_Console.buffer);
                 }
@@ -127,13 +130,16 @@ module TSOS {
                     _OsShell.commandPointer -= 1;
                 }
             }
-            else {
-                //_StdOut.putText("down: " + _OsShell.commandHistory[_OsShell.commandPointer]);
+            else {                  // If down key is pushed...
+                // Clear buffer and current line of scree, reset x position and reprint prompt
                 _Console.buffer = "";
                 _DrawingContext.clearRect(0, this.currentYPosition - this.currentFontSize, _Canvas.width, this.currentFontSize + 1);
                 this.currentXPosition = 0;
                 _StdOut.putText(_PromptStr);
+
+                // Checking if going beyond most recently-called command, if show display most recent
                 if (_OsShell.commandPointer >= _OsShell.commandPlacerCount) {
+                    _OsShell.commandPointer = _OsShell.commandPlacerCount;
                     _Console.buffer = _OsShell.commandHistory[_OsShell.commandPlacerCount - 1];
                     _StdOut.putText(_Console.buffer);
                 }
@@ -146,13 +152,14 @@ module TSOS {
         }
 
         public backspace() {
+            // Checking for single character strings and handling string splitting differently
             if (_Console.buffer.length === 1) {
                 // Remove most recent character from input buffer
                 var bufferTailChar = _Console.buffer;
                 _Console.buffer = "";
 
                 // Clear character from screen
-                _DrawingContext.clearRect(0, this.currentYPosition - this.currentFontSize, _Canvas.width, this.currentFontSize + 1);
+                _DrawingContext.clearRect(0, this.currentYPosition - this.currentFontSize, _Canvas.width, this.currentFontSize + 4);
                 this.currentXPosition = 0;
                 _StdOut.putText(_PromptStr);
             }
@@ -163,7 +170,7 @@ module TSOS {
                 _Console.buffer = bufferRemains;
 
                 // Clear character from screen
-                _DrawingContext.clearRect(this.currentXPosition - _DrawingContext.measureText(this.currentFont, this.currentFontSize, bufferTailChar), this.currentYPosition - this.currentFontSize, _DrawingContext.measureText(this.currentFont, this.currentFontSize, bufferTailChar), this.currentFontSize + 1);
+                _DrawingContext.clearRect(this.currentXPosition - _DrawingContext.measureText(this.currentFont, this.currentFontSize, bufferTailChar), this.currentYPosition - this.currentFontSize, _DrawingContext.measureText(this.currentFont, this.currentFontSize, bufferTailChar), this.currentFontSize + 4);
                 this.currentXPosition = this.currentXPosition - _DrawingContext.measureText(this.currentFont, this.currentFontSize, bufferTailChar);
             }
         }
@@ -172,20 +179,22 @@ module TSOS {
             var partialInput = _Console.buffer;
             //var index = 0;
             var found = false;
-            while (!found && _TabIndex < _OsShell.commandList.length) {
-                if ((_OsShell.commandList[_TabIndex].command).substr(0, partialInput.length - 1) === partialInput) {
+            while (!found && (_TabIndex < _OsShell.commandList.length)) {
+                var testString = ((_OsShell.commandList[_TabIndex]).command).substring(0, partialInput.length);
+                if (testString.localeCompare(partialInput) === 0) {
                     found = true;
                 }
                 else {
-                    ++_TabIndex;
+                    _TabIndex++;
                 }
             }
             if (found) {
                 _Console.buffer = _OsShell.commandList[_TabIndex].command;
                 _Console.currentXPosition = 0;
-                _DrawingContext.clearRect(0, this.currentYPosition - this.currentFontSize, _Canvas.width, this.currentFontSize);
-                _StdOut.putPrompt();
+                _DrawingContext.clearRect(0, this.currentYPosition - this.currentFontSize, _Canvas.width, this.currentFontSize + 1);
+                _StdOut.putText(_PromptStr);
                 _StdOut.putText(_Console.buffer);
+                _TabIndex++;
             }
         }
     }

@@ -132,11 +132,11 @@ module TSOS {
             //
             // Parse the input...
             //
+            // Add used commands to ordered array for command history recall
             this.commandHistory[this.commandPlacerCount] = buffer;
-            //_StdOut.putText("Array Content: " + this.commandHistory[this.commandPlacerCount]);
             this.commandPointer = this.commandPlacerCount;
-            //_StdOut.putText("Pointer at: " + this.commandPointer);
             this.commandPlacerCount++;
+
             var userCommand = new UserCommand();
             userCommand = this.parseInput(buffer);
             // ... and assign the command and args to local variables.
@@ -160,7 +160,7 @@ module TSOS {
             }
             if (found) {
                 this.execute(fn, args);
-                _TabIndex = 0;
+                _TabIndex = 0;  // Resets tab index variable after execution of a shell command, signifying end of current tabbing for current command
             } else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
                 if (this.curses.indexOf("[" + Utils.rot13(cmd) + "]") >= 0) {     // Check for curses. {
@@ -326,6 +326,8 @@ module TSOS {
         }
 
         public shellDate() {
+            //TODO: Replace current multi-variable time format, possible simplified implementation of date/time formatting that already exists
+
             var currDate = new Date();
             var currDay = currDate.getDate();
             var currMonth = currDate.getMonth() + 1;
@@ -386,7 +388,25 @@ module TSOS {
 
         public shellLoad(args) {
             if(args[0].length > 0) {
-
+                var programTextElem = <HTMLInputElement> document.getElementById("taProgramInput");
+                var programStr: string = programTextElem.value.toString();
+                var isValidHex = true;
+                var textCount = 0;
+                while (isValidHex && textCount < programStr.length) {
+                    var chkChr = programStr.charCodeAt(textCount);
+                    if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
+                        textCount++;
+                    }
+                    else {
+                        isValidHex = false;
+                    }
+                }
+                if (isValidHex) {
+                    _StdOut.putText("User Code " + args + " is valid and safe to load.");
+                }
+                else {
+                    _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
+                }
             }
         }
 

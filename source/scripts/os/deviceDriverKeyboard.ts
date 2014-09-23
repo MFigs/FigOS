@@ -18,52 +18,57 @@ module TSOS {
             super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
         }
 
+        // TODO: Get below dictionary format to work in this program so as to replace the case statement implementation of symbol key recognition/printing
 
-        static symbolCharCodeASCIIMatch: {[keycode: number] : number;} = {
-            186 : 59, //;
-            187 : 61, //=
-            188 : 44, //,
-            189 : 45, //-
-            190 : 46, //.
-            191 : 47, ///
-            192 : 96, //`
-            219 : 91, //[
-            220 : 92, //\
-            221 : 93, //]
-            222 : 39  //'
+        /*public symbolCharCodeASCIIMatch: {[keycode: string] : number[];} = {
+            '186' : [59], //;
+            '187' : [61], //=
+            '188' : [44], //,
+            '189' : [45], //-
+            '190' : [46], //.
+            '191' : [47], ///
+            '192' : [96], //`
+            '219' : [91], //[
+            '220' : [92], //\
+            '221' : [93], //]
+            '222' : [39]  //'
         };
 
-        static symbolCharCodeASCIIMatchShift: {[keycode: number] : number;} = {
-            48 : 41,   //)
-            49 : 33,   //!
-            50 : 64,   //@
-            51 : 35,   //#
-            52 : 36,   //$
-            53 : 37,   //%
-            54 : 94,   //^
-            55 : 38,   //&
-            56 : 42,   //*
-            57 : 40,   //(
-            186 : 58,  //:
-            187 : 43,  //+
-            188 : 60,  //<
-            189 : 95,  //_
-            190 : 62,  //>
-            191 : 63,  //?
-            192 : 126, //~
-            219 : 123, //{
-            220 : 124, //|
-            221 : 125, //}
-            222 : 34   //"
+        public symbolCharCodeASCIIMatchShift: {[keycode: string] : number[];} = {
+            '48' : [41],   //)
+            '49' : [33],   //!
+            '50' : [64],   //@
+            '51' : [35],   //#
+            '52' : [36],   //$
+            '53' : [37],   //%
+            '54' : [94],   //^
+            '55' : [38],   //&
+            '56' : [42],   /*//*
+            '57' : [40],   //(
+            '186' : [58],  //:
+            '187' : [43],  //+
+            '188' : [60],  //<
+            '189' : [95],  //_
+            '190' : [62],  //>
+            '191' : [63],  //?
+            '192' : [126], //~
+            '219' : [123], //{
+            '220' : [124], //|
+            '221' : [125], //}
+            '222' : [34]   //"
         };
 
-        //public findASCIIFromKeyCodeShift(keycode): number {
-        //    return symbolCharCodeASCIIMatchShift[keycode];
-        //}
+        public findASCIIFromKeyCodeShift(keys: number): number {
+            if (keys in this.symbolCharCodeASCIIMatchShift) {
+                return this.symbolCharCodeASCIIMatchShift.keys[0];
+            }
+        }
 
-        //public findASCIIFromKeyCode(keycode): number {
-        //    return symbolCharCodeASCIIMatch[keycode];
-        //}
+        public findASCIIFromKeyCode(keys: number): number {
+            if (keys in this.symbolCharCodeASCIIMatch) {
+                return this.symbolCharCodeASCIIMatch.keys[0];
+            }
+        }*/
 
         public krnKbdDriverEntry() {
             // Initialization routine for this, the kernel-mode Keyboard Device Driver.
@@ -93,8 +98,8 @@ module TSOS {
                 _KernelInputQueue.enqueue(chr);
             }
             else if (((keyCode >= 48) && (keyCode <= 57) && (!isShifted)) ||   // digits
-                        (keyCode === 32)                     ||   // space
-                        (keyCode === 13)) {                       // enter
+                (keyCode === 32) ||   // space
+                (keyCode === 13)) {                       // enter
                 chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
             }
@@ -109,17 +114,63 @@ module TSOS {
                 _Console.tabComplete();
             }
 
-            //else if (((keyCode >= 186) && (keyCode <= 192)) || ((keyCode >= 219) && (keyCode <= 222)) || ((keyCode >= 48) && (keyCode <= 57) && (isShifted))){
-            //    if (isShifted) {
-            //        chr = String.fromCharCode(this.findASCIIFromKeyCodeShift(keyCode));
-            //        _KernelInputQueue.enqueue(chr);
-            //    }
-            //    else {
-            //        chr = String.fromCharCode(this.findASCIIFromKeyCode(keyCode));
-            //        _KernelInputQueue.enqueue(chr);
-            //    }
-            //}
 
+            else if (((keyCode >= 186) && (keyCode <= 192)) || ((keyCode >= 219) && (keyCode <= 222)) || ((keyCode >= 48) && (keyCode <= 57) && (isShifted))) {
+                if (isShifted) {
+                    chr = String.fromCharCode(this.findASCIIFromKeyCodeShift(keyCode));
+                    _KernelInputQueue.enqueue(chr);
+                }
+                else {
+                    chr = String.fromCharCode(this.findASCIIFromKeyCode(keyCode));
+                    _KernelInputQueue.enqueue(chr);
+                }
+            }
+        }
+
+        // Apologizing to all readers for this atrocious case statement... Still in the process of figuring out typescript dictionary formatting and access
+        // Returns the corresponding ASCII value of a given key code for shifted symbol characters
+        public findASCIIFromKeyCodeShift(keys): number {
+            switch (keys) {
+                case 48 : {return 41;}   //)
+                case 49 : {return 33;}   //!
+                case 50 : {return 64;}   //@
+                case 51 : {return 35;}   //#
+                case 52 : {return 36;}   //$
+                case 53 : {return 37;}   //%
+                case 54 : {return 94;}   //^
+                case 55 : {return 38;}   //&
+                case 56 : {return 42;}   //*
+                case 57 : {return 40;}   //(
+                case 186 : {return 58;}  //:
+                case 187 : {return 43;}  //+
+                case 188 : {return 60;}  //<
+                case 189 : {return 95;}  //_
+                case 190 : {return 62;}  //>
+                case 191 : {return 63;}  //?
+                case 192 : {return 126;} //~
+                case 219 : {return 123;} //{
+                case 220 : {return 124;} //|
+                case 221 : {return 125;} //}
+                case 222 : {return 34;}  //"
+            }
+        }
+
+        // Shield your eyes again... Dirty case statement that gets the job done
+        // Returns the corresponding ASCII value of a given key code for non-shifted symbol characters
+        public findASCIIFromKeyCode(keys): number {
+            switch (keys) {
+                case 186 : {return 59;}  //:
+                case 187 : {return 61;}  //+
+                case 188 : {return 44;}  //<
+                case 189 : {return 45;}  //_
+                case 190 : {return 46;}  //>
+                case 191 : {return 47;}  //?
+                case 192 : {return 96;} //~
+                case 219 : {return 91;} //{
+                case 220 : {return 92;} //|
+                case 221 : {return 93;} //}
+                case 222 : {return 39;}  //"
+            }
         }
 
     }

@@ -66,6 +66,7 @@ var onDocumentLoad = function () {
     TSOS.Control.hostInit();
 };
 
+// TODO: Find alternatives to global variable usage if at all possible for the following variables:
 var _Status = "good";
 var _TabIndex = 0;
 var _PromptStr = ">";

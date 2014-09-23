@@ -27,6 +27,8 @@ module TSOS {
             // Initialize the console.
             _Console.init();
 
+            //TODO: Replace current multi-variable time format below, possible simplified implementation of date/time formatting that already exists
+
             setInterval(function(){
 
                 var cDate = new Date();

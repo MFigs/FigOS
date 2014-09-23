@@ -70,6 +70,8 @@ var onDocumentLoad = function() {
 	TSOS.Control.hostInit();
 };
 
-var _Status = "good";
-var _TabIndex = 0;
-var _PromptStr = ">";
+// TODO: Find alternatives to global variable usage if at all possible for the following variables:
+
+var _Status = "good"; // Global variable for shell status command changes and access via console
+var _TabIndex = 0;    // Global variable for search index persistence throughout various calls to tab completion
+var _PromptStr = ">"; // Global prompt variable that addresses issues in _OsShell.putPrompt() functionality in other files
