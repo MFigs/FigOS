@@ -74,6 +74,7 @@ var TSOS;
                     var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                     if ((this.currentXPosition + offset) > _Canvas.width) {
                         this.advanceLine();
+                        this.currentXPosition += 30;
                     }
 
                     // Draw the text at the current X and Y coordinates.
@@ -97,7 +98,7 @@ var TSOS;
             */
             this.currentYPosition += _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) + _FontHeightMargin;
 
-            while (this.currentYPosition > _Canvas.height) {
+            while (this.currentYPosition > _Canvas.height - 2) {
                 var canImg = _DrawingContext.getImageData(0, this.currentFontSize, 500, 561);
                 _DrawingContext.putImageData(canImg, 0, 0);
                 this.currentYPosition -= this.currentFontSize;
@@ -105,8 +106,17 @@ var TSOS;
         };
 
         Console.prototype.displayBSOD = function (msg) {
-            _StdOut.putText("KERNEL ERROR: " + msg);
-            // TODO: Get background color/overlay text to print to CLI
+            //_StdOut.putText("KERNEL ERROR: " + msg);
+            _StdOut.clearScreen();
+
+            _Canvas = document.getElementById("display");
+            _Canvas.style.backgroundColor = "#0000FF";
+            var can = _Canvas.getContext("2d");
+            can.fillStyle = "#FFFFFF";
+            can.font = "12px Comic Sans MS";
+            can.fillText("KERNEL ERROR: \n" + msg + "...\n Please Restart OS...", 5, 280);
+            //can.fill();
+            // TODO: Figure out why code below would not print anything to canvas
             //var can = _DrawingContext.getElementById['divConsole'];
             //var can1 = can.getElementById['display'];
             //var canPrint= can1.getContext("2d");
@@ -115,18 +125,6 @@ var TSOS;
             //canPrint.fill();
             //canPrint.font = "40px Arial";
             //canPrint.fillText("KERNEL ERROR: " + msg, 0, this.currentFontSize);
-        };
-
-        Console.prototype.resetCLI = function () {
-            _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
-            this.currentXPosition = 0;
-            this.currentYPosition = this.currentFontSize;
-            _StdOut.putText("Recovering from Kernel Error... Restarting...");
-            _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
-            this.currentXPosition = 0;
-            this.currentYPosition = this.currentFontSize;
-            _StdOut.putText(_PromptStr);
-            _Console.buffer = "";
         };
 
         Console.prototype.scrollPrevCommands = function (keycode) {

@@ -355,6 +355,7 @@ var TSOS;
             }
         };
 
+        // TODO: Fix load function to stop "enter" key from causing program to think hex code is invalid
         Shell.prototype.shellLoad = function (args) {
             if (args[0].length > 0) {
                 var programTextElem = document.getElementById("taProgramInput");
@@ -370,7 +371,7 @@ var TSOS;
                     }
                 }
                 if (isValidHex) {
-                    _StdOut.putText("User Code " + args + " is valid and safe to load.");
+                    _StdOut.putText("User Code " + args + " is valid and safe(ish) to load.");
                 } else {
                     _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
                 }
