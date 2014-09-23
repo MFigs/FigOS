@@ -119,7 +119,7 @@ var TSOS;
             }
         };
 
-        // Apologizing to all readers for this atrocious case statement... Still in the process of figuring out typescript dictionary formatting and access
+        // Apologizing to all readers for this atrocious switch statement... Still in the process of figuring out typescript dictionary formatting and access
         // Returns the corresponding ASCII value of a given key code for shifted symbol characters
         DeviceDriverKeyboard.prototype.findASCIIFromKeyCodeShift = function (keys) {
             switch (keys) {
@@ -189,7 +189,7 @@ var TSOS;
             }
         };
 
-        // Shield your eyes again... Dirty case statement that gets the job done
+        // Shield your eyes again... Dirty switch statement that gets the job done
         // Returns the corresponding ASCII value of a given key code for non-shifted symbol characters
         DeviceDriverKeyboard.prototype.findASCIIFromKeyCode = function (keys) {
             switch (keys) {

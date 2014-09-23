@@ -98,8 +98,8 @@ module TSOS {
                 _KernelInputQueue.enqueue(chr);
             }
             else if (((keyCode >= 48) && (keyCode <= 57) && (!isShifted)) ||   // digits
-                (keyCode === 32) ||   // space
-                (keyCode === 13)) {                       // enter
+                (keyCode === 32) ||                              // space
+                (keyCode === 13)) {                              // enter
                 chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
             }
@@ -127,7 +127,7 @@ module TSOS {
             }
         }
 
-        // Apologizing to all readers for this atrocious case statement... Still in the process of figuring out typescript dictionary formatting and access
+        // Apologizing to all readers for this atrocious switch statement... Still in the process of figuring out typescript dictionary formatting and access
         // Returns the corresponding ASCII value of a given key code for shifted symbol characters
         public findASCIIFromKeyCodeShift(keys): number {
             switch (keys) {
@@ -155,21 +155,21 @@ module TSOS {
             }
         }
 
-        // Shield your eyes again... Dirty case statement that gets the job done
+        // Shield your eyes again... Dirty switch statement that gets the job done
         // Returns the corresponding ASCII value of a given key code for non-shifted symbol characters
         public findASCIIFromKeyCode(keys): number {
             switch (keys) {
-                case 186 : {return 59;}  //:
-                case 187 : {return 61;}  //+
-                case 188 : {return 44;}  //<
-                case 189 : {return 45;}  //_
-                case 190 : {return 46;}  //>
-                case 191 : {return 47;}  //?
-                case 192 : {return 96;} //~
-                case 219 : {return 91;} //{
-                case 220 : {return 92;} //|
-                case 221 : {return 93;} //}
-                case 222 : {return 39;}  //"
+                case 186 : {return 59;}  //;
+                case 187 : {return 61;}  //=
+                case 188 : {return 44;}  //,
+                case 189 : {return 45;}  //-
+                case 190 : {return 46;}  //.
+                case 191 : {return 47;}  ///
+                case 192 : {return 96;}  //`
+                case 219 : {return 91;}  //[
+                case 220 : {return 92;}  //\
+                case 221 : {return 93;}  //]
+                case 222 : {return 39;}  //'
             }
         }
 

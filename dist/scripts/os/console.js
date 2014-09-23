@@ -106,9 +106,27 @@ var TSOS;
 
         Console.prototype.displayBSOD = function (msg) {
             _StdOut.putText("KERNEL ERROR: " + msg);
-            //_DrawingContext.rect(0, 0, _Canvas.width, _Canvas.height);
-            //_DrawingContext.fillStyle="#0000FF";
-            //_DrawingContext.fill();
+            // TODO: Get background color/overlay text to print to CLI
+            //var can = _DrawingContext.getElementById['divConsole'];
+            //var can1 = can.getElementById['display'];
+            //var canPrint= can1.getContext("2d");
+            //canPrint.rect(0, 0, _Canvas.width, _Canvas.height);
+            //canPrint.fillStyle="0000FF";
+            //canPrint.fill();
+            //canPrint.font = "40px Arial";
+            //canPrint.fillText("KERNEL ERROR: " + msg, 0, this.currentFontSize);
+        };
+
+        Console.prototype.resetCLI = function () {
+            _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
+            this.currentXPosition = 0;
+            this.currentYPosition = this.currentFontSize;
+            _StdOut.putText("Recovering from Kernel Error... Restarting...");
+            _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
+            this.currentXPosition = 0;
+            this.currentYPosition = this.currentFontSize;
+            _StdOut.putText(_PromptStr);
+            _Console.buffer = "";
         };
 
         Console.prototype.scrollPrevCommands = function (keycode) {
