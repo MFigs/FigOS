@@ -115,6 +115,12 @@ module TSOS {
                 "- Displays blue screen error message that is shown when a kernel error occurs.");
             this.commandList[this.commandList.length] = sc;
 
+            //run <number>
+            sc = new ShellCommand(this.shellRun,
+                "run",
+                "<number> - Allows user to run a program loaded in memory, specified by Process ID.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -394,26 +400,52 @@ module TSOS {
                 var programStr: string = programTextElem.value.toString();
                 var isValidHex = true;
                 var textCount = 0;
-                while (isValidHex && textCount < programStr.length) {
-                    var chkChr = programStr.charCodeAt(textCount);
-                    if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
-                        textCount++;
+                if (programStr.length > 0) {
+                    while (isValidHex && textCount < programStr.length) {
+                        var chkChr = programStr.charCodeAt(textCount);
+                        if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
+                            textCount++;
+                        }
+                        else {
+                            isValidHex = false;
+                        }
+                    }
+                    if (isValidHex) {
+                        programStr = programStr.replace(/\s/g, "");
+                        var progMem = new Memory();
+                        progMem.loadMem(_CurrentMemBlock, programStr);
+                        var pcb = new ProcessControlBlock();
+                        _StdOut.putText("Loaded Program: PID " + pcb.PID);
                     }
                     else {
-                        isValidHex = false;
+                        _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
                     }
                 }
-                if (isValidHex) {
-                    _StdOut.putText("User Code " + args + " is valid and safe(ish) to load.");
-                }
                 else {
-                    _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
+                    _StdOut.putText("NO PROGRAM TO LOAD");
                 }
             }
         }
 
         public shellBSOD() {
             _Console.displayBSOD("This is an example BSOD error message");
+        }
+
+        public shellRun(pid: number) {
+
+            _CPU.currentPID = pid;
+            _CPU.loadCPU();
+            _CPU.isExecuting = true;
+
+        }
+
+        private retrievePCB(pid: number) {
+
+            for (var k = 0; k < _PCBArray.length; k++) {
+                var currPCB = _PCBArray[k];
+
+            }
+
         }
 
     }

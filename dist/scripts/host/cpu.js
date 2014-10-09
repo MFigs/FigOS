@@ -13,18 +13,20 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 var TSOS;
 (function (TSOS) {
     var Cpu = (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, isExecuting) {
+        function Cpu(PC, Acc, Xreg, Yreg, Zflag, currentPID, isExecuting) {
             if (typeof PC === "undefined") { PC = 0; }
             if (typeof Acc === "undefined") { Acc = 0; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
             if (typeof Yreg === "undefined") { Yreg = 0; }
             if (typeof Zflag === "undefined") { Zflag = 0; }
+            if (typeof currentPID === "undefined") { currentPID = 0; }
             if (typeof isExecuting === "undefined") { isExecuting = false; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
+            this.currentPID = currentPID;
             this.isExecuting = isExecuting;
         }
         Cpu.prototype.init = function () {
@@ -34,6 +36,17 @@ var TSOS;
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
+            this.currentPID = 0;
+        };
+
+        Cpu.prototype.loadCPU = function (pcb) {
+            this.PC = pcb.progCounter;
+            this.Acc = pcb.accum;
+            this.Xreg = pcb.xReg;
+            this.Yreg = pcb.yReg;
+            this.Zflag = pcb.zFlag;
+            this.currentPID = pcb.PID;
+            this.isExecuting = true;
         };
 
         Cpu.prototype.cycle = function () {

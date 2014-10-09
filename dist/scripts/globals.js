@@ -70,3 +70,8 @@ var onDocumentLoad = function () {
 var _Status = "good";
 var _TabIndex = 0;
 var _PromptStr = ">";
+
+var _MemSize = 768;
+var _MemBlockSize = 256;
+var _CurrentMemBlock = 0;
+var _PIDAssign = 0;

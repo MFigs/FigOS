@@ -81,6 +81,10 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellBSOD, "bsod", "- Displays blue screen error message that is shown when a kernel error occurs.");
             this.commandList[this.commandList.length] = sc;
 
+            //run <number>
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "<number> - Allows user to run a program loaded in memory, specified by Process ID.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -362,24 +366,38 @@ var TSOS;
                 var programStr = programTextElem.value.toString();
                 var isValidHex = true;
                 var textCount = 0;
-                while (isValidHex && textCount < programStr.length) {
-                    var chkChr = programStr.charCodeAt(textCount);
-                    if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
-                        textCount++;
-                    } else {
-                        isValidHex = false;
+                if (programStr.length > 0) {
+                    while (isValidHex && textCount < programStr.length) {
+                        var chkChr = programStr.charCodeAt(textCount);
+                        if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
+                            textCount++;
+                        } else {
+                            isValidHex = false;
+                        }
                     }
-                }
-                if (isValidHex) {
-                    _StdOut.putText("User Code " + args + " is valid and safe(ish) to load.");
+                    if (isValidHex) {
+                        programStr = programStr.replace(/\s/g, "");
+                        var progMem = new TSOS.Memory();
+                        progMem.loadMem(_CurrentMemBlock, programStr);
+                        var pcb = new TSOS.ProcessControlBlock();
+                        _StdOut.putText("Loaded Program: PID " + pcb.PID);
+                    } else {
+                        _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
+                    }
                 } else {
-                    _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
+                    _StdOut.putText("NO PROGRAM TO LOAD");
                 }
             }
         };
 
         Shell.prototype.shellBSOD = function () {
             _Console.displayBSOD("This is an example BSOD error message");
+        };
+
+        Shell.prototype.shellRun = function (pid) {
+            _CPU.currentPID = pid;
+            _CPU.loadCPU();
+            _CPU.isExecuting = true;
         };
         return Shell;
     })();

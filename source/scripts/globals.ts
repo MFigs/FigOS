@@ -26,6 +26,7 @@ var KEYBOARD_IRQ: number = 1;
 // Global Variables
 //
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
+var _PCBArray: Array[];
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -75,3 +76,8 @@ var onDocumentLoad = function() {
 var _Status = "good"; // Global variable for shell status command changes and access via console
 var _TabIndex = 0;    // Global variable for search index persistence throughout various calls to tab completion
 var _PromptStr = ">"; // Global prompt variable that addresses issues in _OsShell.putPrompt() functionality in other files
+
+var _MemSize = 768; // Memory Size in bytes
+var _MemBlockSize = 256;
+var _CurrentMemBlock = 0;
+var _PIDAssign = 0;

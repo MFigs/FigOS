@@ -24,6 +24,7 @@ module TSOS {
                     public Xreg: number = 0,
                     public Yreg: number = 0,
                     public Zflag: number = 0,
+                    public currentPID: number = 0,
                     public isExecuting: boolean = false) {
 
         }
@@ -35,12 +36,28 @@ module TSOS {
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
+            this.currentPID = 0;
+        }
+
+        public loadCPU(pcb: ProcessControlBlock) {
+
+            this.PC = pcb.progCounter;
+            this.Acc = pcb.accum;
+            this.Xreg = pcb.xReg;
+            this.Yreg = pcb.yReg;
+            this.Zflag = pcb.zFlag;
+            this.currentPID = pcb.PID;
+            this.isExecuting = true;
+
         }
 
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+
+
+
         }
     }
 }
