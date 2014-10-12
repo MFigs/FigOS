@@ -26,7 +26,7 @@ var KEYBOARD_IRQ: number = 1;
 // Global Variables
 //
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
-var _PCBArray: Array[];
+var _PCBArray: TSOS.ProcessControlBlock[];
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -81,3 +81,4 @@ var _MemSize = 768; // Memory Size in bytes
 var _MemBlockSize = 256;
 var _CurrentMemBlock = 0;
 var _PIDAssign = 0;
+var _MemoryArray: TSOS.Memory = new TSOS.Memory();

@@ -23,6 +23,7 @@ var KEYBOARD_IRQ = 1;
 // Global Variables
 //
 var _CPU;
+var _PCBArray;
 
 var _OSclock = 0;
 
@@ -75,3 +76,4 @@ var _MemSize = 768;
 var _MemBlockSize = 256;
 var _CurrentMemBlock = 0;
 var _PIDAssign = 0;
+var _MemoryArray = new TSOS.Memory();

@@ -378,7 +378,8 @@ var TSOS;
                     if (isValidHex) {
                         programStr = programStr.replace(/\s/g, "");
                         var progMem = new TSOS.Memory();
-                        progMem.loadMem(_CurrentMemBlock, programStr);
+
+                        //progMem.loadMem(_CurrentMemBlock, programStr);
                         var pcb = new TSOS.ProcessControlBlock();
                         _StdOut.putText("Loaded Program: PID " + pcb.PID);
                     } else {
@@ -396,8 +397,18 @@ var TSOS;
 
         Shell.prototype.shellRun = function (pid) {
             _CPU.currentPID = pid;
-            _CPU.loadCPU();
+
+            //_CPU.loadCPU();
             _CPU.isExecuting = true;
+        };
+
+        Shell.prototype.retrievePCB = function (pid) {
+            for (var k = 0; k < _PCBArray.length; k++) {
+                var currPCB = _PCBArray[k];
+                if (currPCB.PID == pid) {
+                    return currPCB;
+                }
+            }
         };
         return Shell;
     })();

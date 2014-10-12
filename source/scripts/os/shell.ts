@@ -413,7 +413,7 @@ module TSOS {
                     if (isValidHex) {
                         programStr = programStr.replace(/\s/g, "");
                         var progMem = new Memory();
-                        progMem.loadMem(_CurrentMemBlock, programStr);
+                       //progMem.loadMem(_CurrentMemBlock, programStr);
                         var pcb = new ProcessControlBlock();
                         _StdOut.putText("Loaded Program: PID " + pcb.PID);
                     }
@@ -434,7 +434,7 @@ module TSOS {
         public shellRun(pid: number) {
 
             _CPU.currentPID = pid;
-            _CPU.loadCPU();
+            //_CPU.loadCPU();
             _CPU.isExecuting = true;
 
         }
@@ -443,7 +443,9 @@ module TSOS {
 
             for (var k = 0; k < _PCBArray.length; k++) {
                 var currPCB = _PCBArray[k];
-
+                if (currPCB.PID == pid) {
+                    return currPCB;
+                }
             }
 
         }
