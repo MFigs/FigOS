@@ -15,6 +15,9 @@ module TSOS {
         //
         // OS Startup and Shutdown Routines
         //
+
+        public memManager: TSOS.MemoryManager = new MemoryManager();
+
         public krnBootstrap() {      // Page 8. {
             Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
 

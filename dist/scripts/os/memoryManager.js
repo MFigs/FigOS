@@ -14,11 +14,28 @@ var TSOS;
                 loadString = loadString.substr(2);
                 _MemoryArray.mem[memLoc] = loadValue;
                 memLoc++;
+                // Add Memory Bound Check Above Block
             }
         };
 
         MemoryManager.prototype.clearMem = function () {
             _MemoryArray.clearMem();
+        };
+
+        MemoryManager.prototype.storeMem = function (relativeAddress, valueToStore) {
+            if (relativeAddress >= 0 && relativeAddress <= 255) {
+                _MemoryArray[relativeAddress + (_CurrentMemBlock * _MemBlockSize)] = valueToStore;
+            } else {
+                // Kernel Error
+            }
+        };
+
+        MemoryManager.prototype.accessMem = function (relativeAddress) {
+            if (relativeAddress >= 0 && relativeAddress <= 255) {
+                return _MemoryArray[relativeAddress + (_CurrentMemBlock * _MemBlockSize)];
+            } else {
+                // Kernel Error
+            }
         };
         return MemoryManager;
     })();

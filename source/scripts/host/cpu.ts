@@ -56,8 +56,20 @@ module TSOS {
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
 
+            if (_SingleStepActive) {
 
+                // Do Stuff
+
+                this.isExecuting = false;
+            }
+
+            else {
+
+                // Do Stuff
+
+            }
 
         }
+
     }
 }

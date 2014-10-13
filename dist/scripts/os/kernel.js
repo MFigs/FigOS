@@ -9,10 +9,11 @@ var TSOS;
 (function (TSOS) {
     var Kernel = (function () {
         function Kernel() {
+            //
+            // OS Startup and Shutdown Routines
+            //
+            this.memManager = new TSOS.MemoryManager();
         }
-        //
-        // OS Startup and Shutdown Routines
-        //
         Kernel.prototype.krnBootstrap = function () {
             TSOS.Control.hostLog("bootstrap", "host"); // Use hostLog because we ALWAYS want this, even if _Trace is off.
 

@@ -82,3 +82,5 @@ var _MemBlockSize = 256;
 var _CurrentMemBlock = 0;
 var _PIDAssign = 0;
 var _MemoryArray: TSOS.Memory = new TSOS.Memory();
+
+var _SingleStepActive: boolean = false;
