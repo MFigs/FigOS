@@ -5,12 +5,10 @@ module TSOS {
         public command: string;
         public arg1: string = "";
         public arg2: string = "";
-        public hexSpacesForCommand = 0;
 
         constructor(comm: string) {
 
             this.command = comm;
-            this.hexSpacesForCommand = 1;
             this.analyzeCommand();
 
         }
@@ -113,35 +111,56 @@ module TSOS {
             switch(this.command) {
                 case "A9":
                 {
-                    break;// Load the Accumulator with constant
+                    // Load the Accumulator with constant
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    break;
                 }
                 case "AD":
                 {
-                    break;// Load the Accumulator from memory
+                    // Load the Accumulator from memory
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
+                    break;
                 }
                 case "8D":
                 {
-                    break;// Store the Accumulator in memory
+                    // Store the Accumulator in memory
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
+                    break;
                 }
                 case "6D":
                 {
-                    break;// Add with carry from address to accumulator
+                    // Add with carry from address to accumulator
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
+                    break;
                 }
                 case "A2":
                 {
-                    break;// Load x register with a constant
+                    // Load x register with a constant
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    break;
                 }
                 case "AE":
                 {
-                    break;// Load x register from memory
+                    // Load x register from memory
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
+                    break;
                 }
                 case "A0":
                 {
-                    break;// Load y register with a constant
+                    // Load y register with a constant
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    break;
                 }
                 case "AC":
                 {
-                    break;// Load y register from memory
+                    // Load y register from memory
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
+                    break;
                 }
                 case "EA":
                 {
@@ -153,15 +172,23 @@ module TSOS {
                 }
                 case "EC":
                 {
-                    break;// Compare value in memory to x register and sets z flag if equal
+                    // Compare value in memory to x register and sets z flag if equal
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
+                    break;
                 }
                 case "D0":
                 {
-                    break;// Branch # of bytes if z flag is set to zero
+                    // Branch # of bytes if z flag is set to zero
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    break;
                 }
                 case "EE":
                 {
-                    break;// Increment the value of a byte
+                    // Increment the value of a byte
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
+                    break;
                 }
                 case "FF":
                 {
@@ -286,9 +313,19 @@ module TSOS {
                 }
                 case "FF":
                 {
-                    break;// System call:
-                          // $01 in x reg is print y register content
-                          // $02 in x reg is print 00-terminated string at address in y register
+                    // System call:
+                    // $01 in x reg is print y register content
+                    if (_CPU.Xreg === 1) {
+                        _StdOut.putText(_CPU.Yreg);
+                        break;
+                    }
+
+                    // $02 in x reg is print 00-terminated string at address in y register
+                    else if(_CPU.Xreg === 2) {
+                        _StdOut.putText(_Kernel.memManager.accessMem(_CPU.Yreg));
+                        break;
+                    }
+                    break;
                 }
             }
 

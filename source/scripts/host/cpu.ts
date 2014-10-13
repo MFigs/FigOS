@@ -58,14 +58,18 @@ module TSOS {
 
             if (_SingleStepActive) {
 
-                // Do Stuff
+                var nextProgramStep: TSOS.ProgramCommand;
+                nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
+                nextProgramStep.executeCommand();
 
                 this.isExecuting = false;
             }
 
             else {
 
-                // Do Stuff
+                var nextProgramStep: TSOS.ProgramCommand;
+                nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
+                nextProgramStep.executeCommand();
 
             }
 

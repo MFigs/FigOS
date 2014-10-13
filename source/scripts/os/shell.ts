@@ -434,19 +434,21 @@ module TSOS {
         public shellRun(pid: number) {
 
             _CPU.currentPID = pid;
-            //_CPU.loadCPU();
+            _CPU.loadCPU(this.retrievePCB(pid));
             _CPU.isExecuting = true;
 
         }
 
         private retrievePCB(pid: number) {
 
-            for (var k = 0; k < _PCBArray.length; k++) {
-                var currPCB = _PCBArray[k];
-                if (currPCB.PID == pid) {
-                    return currPCB;
-                }
+            var currentPCB: TSOS.ProcessControlBlock;
+
+            for(var i = 0; i <= _PIDAssign; i++) {
+                if (pid === _PCBArray[i].PID)
+                    currentPCB = _PCBArray[i];
             }
+
+            return currentPCB;
 
         }
 

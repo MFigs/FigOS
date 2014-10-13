@@ -8,6 +8,16 @@ body {
   font-style: normal;
 }
 
+table {
+    background: #DFDBC3;
+    border: 1px solid black;
+    padding: 2px;
+
+}
+table td, table th {
+    border: 1px solid black
+}
+
 h1 {
   color: black;
   font-size: 24pt;

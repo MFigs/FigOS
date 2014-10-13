@@ -4,9 +4,7 @@ var TSOS;
         function ProgramCommand(comm) {
             this.arg1 = "";
             this.arg2 = "";
-            this.hexSpacesForCommand = 0;
             this.command = comm;
-            this.hexSpacesForCommand = 1;
             this.analyzeCommand();
         }
         ProgramCommand.prototype.translateFromHexString = function (inputString) {
@@ -293,27 +291,48 @@ var TSOS;
         ProgramCommand.prototype.analyzeCommand = function () {
             switch (this.command) {
                 case "A9": {
+                    // Load the Accumulator with constant
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
                     break;
                 }
                 case "AD": {
+                    // Load the Accumulator from memory
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
                     break;
                 }
                 case "8D": {
+                    // Store the Accumulator in memory
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
                     break;
                 }
                 case "6D": {
+                    // Add with carry from address to accumulator
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
                     break;
                 }
                 case "A2": {
+                    // Load x register with a constant
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
                     break;
                 }
                 case "AE": {
+                    // Load x register from memory
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
                     break;
                 }
                 case "A0": {
+                    // Load y register with a constant
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
                     break;
                 }
                 case "AC": {
+                    // Load y register from memory
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
                     break;
                 }
                 case "EA": {
@@ -323,12 +342,20 @@ var TSOS;
                     break;
                 }
                 case "EC": {
+                    // Compare value in memory to x register and sets z flag if equal
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
                     break;
                 }
                 case "D0": {
+                    // Branch # of bytes if z flag is set to zero
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
                     break;
                 }
                 case "EE": {
+                    // Increment the value of a byte
+                    this.arg1 = _Kernel.memManager.accessMem(_CPU.PC + 1);
+                    this.arg2 = _Kernel.memManager.accessMem(_CPU.PC + 2);
                     break;
                 }
                 case "FF": {
@@ -432,9 +459,16 @@ var TSOS;
                     break;
                 }
                 case "FF": {
-                    break;
+                    // System call:
                     // $01 in x reg is print y register content
-                    // $02 in x reg is print 00-terminated string at address in y register
+                    if (_CPU.Xreg === 1) {
+                        _StdOut.putText(_CPU.Yreg);
+                        break;
+                    } else if (_CPU.Xreg === 2) {
+                        _StdOut.putText(_Kernel.memManager.accessMem(_CPU.Yreg));
+                        break;
+                    }
+                    break;
                 }
             }
         };
