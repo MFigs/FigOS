@@ -73,8 +73,8 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Allows user to change OS status display.");
             this.commandList[this.commandList.length] = sc;
 
-            //load <string>
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<string> - Allows user to load a program in 6502a op codes via the User Program Input section of the GUI.");
+            //load
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Allows user to load a program in 6502a op codes via the User Program Input section of the GUI.");
             this.commandList[this.commandList.length] = sc;
 
             //bsod
@@ -360,14 +360,16 @@ var TSOS;
         };
 
         // TODO: Fix load function to stop "enter" key from causing program to think hex code is invalid
-        Shell.prototype.shellLoad = function (args) {
-            if (args[0].length > 0) {
-                var programTextElem = document.getElementById("taProgramInput");
-                var programStr = programTextElem.value.toString();
+        Shell.prototype.shellLoad = function () {
+            var programTextElem = document.getElementById("taProgramInput");
+            var programStr = programTextElem.value.toString();
+            programStr = programStr.replace(/\s/g, "");
+
+            if (programStr.length > 0) {
                 var isValidHex = true;
                 var textCount = 0;
                 if (programStr.length > 0) {
-                    while (isValidHex && textCount < programStr.length) {
+                    while (isValidHex && (textCount < programStr.length)) {
                         var chkChr = programStr.charCodeAt(textCount);
                         if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
                             textCount++;
@@ -376,11 +378,13 @@ var TSOS;
                         }
                     }
                     if (isValidHex) {
-                        programStr = programStr.replace(/\s/g, "");
-                        var progMem = new TSOS.Memory();
+                        //_StdOut.putText("VALID");
+                        //programStr = programStr.replace(/\s/g, "");
+                        _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
 
-                        //progMem.loadMem(_CurrentMemBlock, programStr);
+                        //_StdOut.putText("LOADED");
                         var pcb = new TSOS.ProcessControlBlock();
+                        _ResidentPCBList[pcb.PID] = 1;
                         _StdOut.putText("Loaded Program: PID " + pcb.PID);
                     } else {
                         _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
@@ -396,9 +400,13 @@ var TSOS;
         };
 
         Shell.prototype.shellRun = function (pid) {
-            _CPU.currentPID = pid;
-            _CPU.loadCPU(this.retrievePCB(pid));
-            _CPU.isExecuting = true;
+            if (_ResidentPCBList[pid] == 1) {
+                _CPU.currentPID = pid;
+                _CPU.loadCPU(this.retrievePCB(pid));
+                _CPU.isExecuting = true;
+            } else {
+                _StdOut.putText("Program referenced is not loaded, please load the program or reference a valid PID");
+            }
         };
 
         Shell.prototype.retrievePCB = function (pid) {

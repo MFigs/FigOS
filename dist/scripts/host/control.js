@@ -40,6 +40,11 @@ var TSOS;
             // Use the TypeScript cast to HTMLInputElement
             document.getElementById("btnStartOS").focus();
 
+            // Initialize Memory
+            _MemoryArray = new TSOS.Memory();
+
+            _MemoryArray.displayMemory();
+
             // Check for our testing and enrichment core.
             if (typeof Glados === "function") {
                 _GLaDOS = new Glados();

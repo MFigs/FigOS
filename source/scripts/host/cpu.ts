@@ -47,7 +47,6 @@ module TSOS {
             this.Yreg = pcb.yReg;
             this.Zflag = pcb.zFlag;
             this.currentPID = pcb.PID;
-            this.isExecuting = true;
 
         }
 
@@ -72,6 +71,15 @@ module TSOS {
                 nextProgramStep.executeCommand();
 
             }
+
+            if (_IsProgramComplete == true) {
+
+                _ResidentPCBList[this.currentPID] = 0;
+                _IsProgramComplete = false;
+
+            }
+
+            _MemoryArray.displayMemory();
 
         }
 

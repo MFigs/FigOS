@@ -16,6 +16,7 @@ module TSOS {
 
                 var loadValue = loadString.substr(0, 2);
                 loadString = loadString.substr(2);
+
                 _MemoryArray.mem[memLoc] = loadValue;
                 memLoc++;
 
@@ -60,6 +61,45 @@ module TSOS {
             }
 
         }
+
+        /*public displayMemory() {
+
+            var mDiv = document.getElementById("divMemory");
+            var mTable = document.createElement("memTable");
+            var mTBody = document.createElement("memTableBody");
+
+            var groupCount: number = 0;
+
+            var dataArray: Node[] = [];
+
+            for (var x = 0; x <= 767; x++) {
+
+                var td = document.createElement("td" + x);
+                var data = document.createTextNode(_Kernel.memManager.accessMem(x));
+                td.appendChild(data);
+                dataArray[x] = td;
+
+            }
+
+            var accessor = 0;
+
+            for (var y = 0; y <= 95; y++) {
+
+                var tr = document.createElement("tr" + y);
+
+                while (groupCount < 8) {
+                    tr.appendChild(dataArray[accessor]);
+                    groupCount++;
+                    accessor++;
+                }
+                groupCount = 0;
+                mTBody.appendChild(tr);
+            }
+
+            mTable.appendChild(mTBody);
+            mDiv.appendChild(mTable);
+
+        }*/
 
     }
 }

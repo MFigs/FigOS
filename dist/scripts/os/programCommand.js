@@ -426,7 +426,8 @@ var TSOS;
                 }
                 case "00": {
                     // Break from program
-                    _CPU.isExecuting = false;
+                    //_CPU.isExecuting = false;
+                    _IsProgramComplete = true;
                     break;
                 }
                 case "EC": {

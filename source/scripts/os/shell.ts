@@ -103,10 +103,10 @@ module TSOS {
                                   "<string> - Allows user to change OS status display.");
             this.commandList[this.commandList.length] = sc;
 
-            //load <string>
+            //load
             sc = new ShellCommand(this.shellLoad,
                 "load",
-                "<string> - Allows user to load a program in 6502a op codes via the User Program Input section of the GUI.");
+                "- Allows user to load a program in 6502a op codes via the User Program Input section of the GUI.");
             this.commandList[this.commandList.length] = sc;
 
             //bsod
@@ -394,14 +394,18 @@ module TSOS {
 
         // TODO: Fix load function to stop "enter" key from causing program to think hex code is invalid
 
-        public shellLoad(args) {
-            if(args[0].length > 0) {
+        public shellLoad() {
+
                 var programTextElem = <HTMLInputElement> document.getElementById("taProgramInput");
                 var programStr: string = programTextElem.value.toString();
+                programStr = programStr.replace(/\s/g, "");
+
+            if(programStr.length > 0) {
+
                 var isValidHex = true;
                 var textCount = 0;
                 if (programStr.length > 0) {
-                    while (isValidHex && textCount < programStr.length) {
+                    while (isValidHex && (textCount < programStr.length)) {
                         var chkChr = programStr.charCodeAt(textCount);
                         if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
                             textCount++;
@@ -411,10 +415,12 @@ module TSOS {
                         }
                     }
                     if (isValidHex) {
-                        programStr = programStr.replace(/\s/g, "");
-                        var progMem = new Memory();
-                       //progMem.loadMem(_CurrentMemBlock, programStr);
+                        //_StdOut.putText("VALID");
+                        //programStr = programStr.replace(/\s/g, "");
+                       _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
+                        //_StdOut.putText("LOADED");
                         var pcb = new ProcessControlBlock();
+                        _ResidentPCBList[pcb.PID] = 1;
                         _StdOut.putText("Loaded Program: PID " + pcb.PID);
                     }
                     else {
@@ -433,9 +439,15 @@ module TSOS {
 
         public shellRun(pid: number) {
 
-            _CPU.currentPID = pid;
-            _CPU.loadCPU(this.retrievePCB(pid));
-            _CPU.isExecuting = true;
+            if (_ResidentPCBList[pid] == 1) {
+                _CPU.currentPID = pid;
+                _CPU.loadCPU(this.retrievePCB(pid));
+                _CPU.isExecuting = true;
+            }
+
+            else {
+                _StdOut.putText("Program referenced is not loaded, please load the program or reference a valid PID");
+            }
 
         }
 

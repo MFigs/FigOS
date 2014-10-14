@@ -46,7 +46,6 @@ var TSOS;
             this.Yreg = pcb.yReg;
             this.Zflag = pcb.zFlag;
             this.currentPID = pcb.PID;
-            this.isExecuting = true;
         };
 
         Cpu.prototype.cycle = function () {
@@ -65,6 +64,13 @@ var TSOS;
                 nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
                 nextProgramStep.executeCommand();
             }
+
+            if (_IsProgramComplete == true) {
+                _ResidentPCBList[this.currentPID] = 0;
+                _IsProgramComplete = false;
+            }
+
+            _MemoryArray.displayMemory();
         };
         return Cpu;
     })();

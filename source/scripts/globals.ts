@@ -81,6 +81,8 @@ var _MemSize = 768; // Memory Size in bytes
 var _MemBlockSize = 256;
 var _CurrentMemBlock = 0;
 var _PIDAssign = 0;
-var _MemoryArray: TSOS.Memory = new TSOS.Memory();
+var _MemoryArray: TSOS.Memory;
 
 var _SingleStepActive: boolean = false;
+var _IsProgramComplete: boolean = false;
+var _ResidentPCBList: number[];

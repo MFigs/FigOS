@@ -89,6 +89,9 @@ module TSOS {
             _OsShell = new Shell();
             _OsShell.init();
 
+            // Initiate Resident Process List
+            _ResidentPCBList = [];
+
             // Finally, initiate testing.
             if (_GLaDOS) {
                 _GLaDOS.afterStartup();
