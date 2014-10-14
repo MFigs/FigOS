@@ -378,12 +378,9 @@ var TSOS;
                         }
                     }
                     if (isValidHex) {
-                        //_StdOut.putText("VALID");
-                        //programStr = programStr.replace(/\s/g, "");
                         _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
-
-                        //_StdOut.putText("LOADED");
                         var pcb = new TSOS.ProcessControlBlock();
+                        _PCBArray[pcb.PID] = pcb;
                         _ResidentPCBList[pcb.PID] = 1;
                         _StdOut.putText("Loaded Program: PID " + pcb.PID);
                         _Kernel.memManager.updateMem();
@@ -402,23 +399,14 @@ var TSOS;
 
         Shell.prototype.shellRun = function (pid) {
             if (_ResidentPCBList[pid] == 1) {
+                _StdOut.putText("pcb found");
                 _CPU.currentPID = pid;
-                _CPU.loadCPU(this.retrievePCB(pid));
+                _CPU.loadCPU(_PCBArray[_CPU.currentPID]);
+                _StdOut.putText("CPU loaded");
                 _CPU.isExecuting = true;
             } else {
                 _StdOut.putText("Program referenced is not loaded, please load the program or reference a valid PID");
             }
-        };
-
-        Shell.prototype.retrievePCB = function (pid) {
-            var currentPCB;
-
-            for (var i = 0; i <= _PIDAssign; i++) {
-                if (pid === _PCBArray[i].PID)
-                    currentPCB = _PCBArray[i];
-            }
-
-            return currentPCB;
         };
         return Shell;
     })();

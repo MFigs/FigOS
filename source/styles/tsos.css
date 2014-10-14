@@ -43,6 +43,10 @@ h3 {
   font-style: normal;
 }
 
+#divCPUTable {
+    width: 225px;
+}
+
 #display {
   background-color:#DFDBC3;
   border: 2px solid red;

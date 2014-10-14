@@ -63,7 +63,7 @@ var TSOS;
             _StdIn = _Console;
             _StdOut = _Console;
 
-            this.memManager.updateMem();
+            this.updateState();
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
@@ -85,6 +85,9 @@ var TSOS;
 
             // Initiate Resident Process List
             _ResidentPCBList = [];
+
+            // Initiate PCB List
+            _PCBArray = [];
 
             // Finally, initiate testing.
             if (_GLaDOS) {
@@ -200,6 +203,31 @@ var TSOS;
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
             _Console.displayBSOD(msg);
             this.krnShutdown();
+        };
+
+        Kernel.prototype.updateCPU = function () {
+            var dataCell0 = document.getElementById("tdc0");
+            dataCell0.innerHTML = "" + _CPU.PC;
+
+            var dataCell1 = document.getElementById("tdc1");
+            dataCell0.innerHTML = _Kernel.memManager.accessMem(_CPU.PC);
+
+            var dataCell2 = document.getElementById("tdc2");
+            dataCell0.innerHTML = "" + _CPU.Acc;
+
+            var dataCell3 = document.getElementById("tdc3");
+            dataCell0.innerHTML = "" + _CPU.Xreg;
+
+            var dataCell4 = document.getElementById("tdc4");
+            dataCell0.innerHTML = "" + _CPU.Yreg;
+
+            var dataCell5 = document.getElementById("tdc5");
+            dataCell0.innerHTML = "" + _CPU.Zflag;
+        };
+
+        Kernel.prototype.updateState = function () {
+            _Kernel.memManager.updateMem();
+            _Kernel.updateCPU();
         };
         return Kernel;
     })();
