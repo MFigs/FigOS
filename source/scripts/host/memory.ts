@@ -23,7 +23,7 @@ module TSOS {
 
         public displayMemory() {
 
-            var mDiv = document.getElementById("divMemory");
+            var mDiv = document.getElementById("divMemTableArea");
             var mTable = document.createElement("memTable");
             var mTBody = document.createElement("memTableBody");
 
@@ -33,7 +33,8 @@ module TSOS {
 
             for (var x = 0; x <= 767; x++) {
 
-                var td = document.createElement("td" + x);
+                var td = document.createElement('td');
+                td.setAttribute('id', "td" + x);
                 var data = document.createTextNode(this.mem[x]);
                 td.appendChild(data);
                 dataArray[x] = td;
@@ -44,7 +45,8 @@ module TSOS {
 
             for (var y = 0; y <= 95; y++) {
 
-                var tr = document.createElement("tr" + y);
+                var tr = document.createElement('tr');
+                tr.setAttribute('id', "tr" + y);
 
                 while (groupCount < 8) {
                     tr.appendChild(dataArray[accessor]);
@@ -57,7 +59,6 @@ module TSOS {
 
             mTable.appendChild(mTBody);
             mDiv.appendChild(mTable);
-
         }
 
     }

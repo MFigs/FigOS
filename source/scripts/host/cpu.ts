@@ -79,7 +79,7 @@ module TSOS {
 
             }
 
-            _MemoryArray.displayMemory();
+            _Kernel.memManager.updateMem();
 
         }
 

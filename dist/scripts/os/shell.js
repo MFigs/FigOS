@@ -386,6 +386,7 @@ var TSOS;
                         var pcb = new TSOS.ProcessControlBlock();
                         _ResidentPCBList[pcb.PID] = 1;
                         _StdOut.putText("Loaded Program: PID " + pcb.PID);
+                        _Kernel.memManager.updateMem();
                     } else {
                         _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
                     }

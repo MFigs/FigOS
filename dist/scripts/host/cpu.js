@@ -70,7 +70,7 @@ var TSOS;
                 _IsProgramComplete = false;
             }
 
-            _MemoryArray.displayMemory();
+            _Kernel.memManager.updateMem();
         };
         return Cpu;
     })();

@@ -50,7 +50,7 @@ module TSOS {
 
             if (relativeAddress >= 0 && relativeAddress <= 255) {
 
-                return _MemoryArray[relativeAddress + (_CurrentMemBlock * _MemBlockSize)];
+                return _MemoryArray.mem[relativeAddress + (_CurrentMemBlock * _MemBlockSize)];
 
             }
 
@@ -62,44 +62,32 @@ module TSOS {
 
         }
 
-        /*public displayMemory() {
+        public accessFullMem(relativeAddress: number): string {
 
-            var mDiv = document.getElementById("divMemory");
-            var mTable = document.createElement("memTable");
-            var mTBody = document.createElement("memTableBody");
+            if (relativeAddress >= 0 && relativeAddress <= 767) {
 
-            var groupCount: number = 0;
-
-            var dataArray: Node[] = [];
-
-            for (var x = 0; x <= 767; x++) {
-
-                var td = document.createElement("td" + x);
-                var data = document.createTextNode(_Kernel.memManager.accessMem(x));
-                td.appendChild(data);
-                dataArray[x] = td;
+                return _MemoryArray.mem[relativeAddress];
 
             }
 
-            var accessor = 0;
+            else {
 
-            for (var y = 0; y <= 95; y++) {
+                // Kernel Error
 
-                var tr = document.createElement("tr" + y);
-
-                while (groupCount < 8) {
-                    tr.appendChild(dataArray[accessor]);
-                    groupCount++;
-                    accessor++;
-                }
-                groupCount = 0;
-                mTBody.appendChild(tr);
             }
 
-            mTable.appendChild(mTBody);
-            mDiv.appendChild(mTable);
+        }
 
-        }*/
+        public updateMem() {
+
+            for (var z = 0; z <= 767; z++) {
+
+                var dataCell = document.getElementById("td" + z);
+                dataCell.innerHTML = _Kernel.memManager.accessFullMem(z);
+
+            }
+
+        }
 
     }
 }

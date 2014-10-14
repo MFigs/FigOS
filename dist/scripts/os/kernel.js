@@ -63,6 +63,8 @@ var TSOS;
             _StdIn = _Console;
             _StdOut = _Console;
 
+            this.memManager.updateMem();
+
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.

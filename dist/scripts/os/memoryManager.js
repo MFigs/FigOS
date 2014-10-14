@@ -33,9 +33,24 @@ var TSOS;
 
         MemoryManager.prototype.accessMem = function (relativeAddress) {
             if (relativeAddress >= 0 && relativeAddress <= 255) {
-                return _MemoryArray[relativeAddress + (_CurrentMemBlock * _MemBlockSize)];
+                return _MemoryArray.mem[relativeAddress + (_CurrentMemBlock * _MemBlockSize)];
             } else {
                 // Kernel Error
+            }
+        };
+
+        MemoryManager.prototype.accessFullMem = function (relativeAddress) {
+            if (relativeAddress >= 0 && relativeAddress <= 767) {
+                return _MemoryArray.mem[relativeAddress];
+            } else {
+                // Kernel Error
+            }
+        };
+
+        MemoryManager.prototype.updateMem = function () {
+            for (var z = 0; z <= 767; z++) {
+                var dataCell = document.getElementById("td" + z);
+                dataCell.innerHTML = _Kernel.memManager.accessFullMem(z);
             }
         };
         return MemoryManager;
