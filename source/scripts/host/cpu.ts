@@ -150,9 +150,14 @@ module TSOS {
 
             if (_SingleStepActive) {
 
-                var nextProgramStep: TSOS.ProgramCommand;
+                var nextProgramStep:TSOS.ProgramCommand;
                 nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
-                nextProgramStep.executeCommand();
+
+                _PrevPC = _CPU.PC;
+
+                if (_NextClicked) {
+                    nextProgramStep.executeCommand();
+                }
 
                 this.isExecuting = false;
             }
@@ -162,13 +167,6 @@ module TSOS {
                 var nextProgramStep: TSOS.ProgramCommand;
                 nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
                 nextProgramStep.executeCommand();
-
-            }
-
-            if (_IsProgramComplete == true) {
-
-                _ResidentPCBList[this.currentPID] = 0;
-                _IsProgramComplete = false;
 
             }
 

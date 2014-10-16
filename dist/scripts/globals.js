@@ -79,5 +79,8 @@ var _PIDAssign = 0;
 var _MemoryArray;
 
 var _SingleStepActive = false;
-var _IsProgramComplete = false;
+var _NextClicked = false;
+var _ActiveProgramExists = false;
+var _PrevPC = 0;
+
 var _ResidentPCBList;

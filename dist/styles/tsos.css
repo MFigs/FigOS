@@ -43,8 +43,23 @@ h3 {
   font-style: normal;
 }
 
-#divCPUTable {
-    width: 225px;
+#tdc0 {
+    width: 35px;
+}
+#tdc1 {
+    width: 35px;
+}
+#tdc2 {
+    width: 35px;
+}
+#tdc3 {
+    width: 35px;
+}
+#tdc4 {
+    width: 35px;
+}
+#tdc5 {
+    width: 35px;
 }
 
 #display {

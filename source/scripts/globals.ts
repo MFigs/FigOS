@@ -84,5 +84,8 @@ var _PIDAssign = 0;
 var _MemoryArray: TSOS.Memory;
 
 var _SingleStepActive: boolean = false;
-var _IsProgramComplete: boolean = false;
+var _NextClicked: boolean = false;
+var _ActiveProgramExists: boolean = false;
+var _PrevPC: number = 0;
+
 var _ResidentPCBList: number[];

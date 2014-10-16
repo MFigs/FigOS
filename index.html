@@ -68,6 +68,24 @@
              value="Reset"
              tabindex="2"
              onclick="TSOS.Control.hostBtnReset_click(this);">
+
+      <input type="button"
+             id = "btnSingleStepToggle"
+             name="brnSST"
+             class="normal_button"
+             disabled="disabled"
+             value="Single Step"
+             tabindex="3"
+             onclick="TSOS.Control.hostBtnToggleSingle_click(this);">
+
+      <input type="button"
+             id = "btnNextStep"
+             name="brnNS"
+             class="normal_button"
+             disabled="disabled"
+             value="Next"
+             tabindex="4"
+             onclick="TSOS.Control.hostBtnNext_click(this);">
    </div>
 
    <div id="statusBar" style="margin:4px">
@@ -110,26 +128,28 @@
       </label>
    </div>
 
-    <div id="divBelowCanvas">
-       <div id="divMemLabel" style="margin-left:4px; padding-bottom:10px">
-           <label>
-               <b>Main Memory:</b>
-           </label>
-           <br>
-           <div id="divMemory" style="margin-left:0px; height:200px; width:290px; overflow:scroll; background-color:#FFFFFF;">
-               <div id="divMemTableArea"></div>
-           </div>
+   <div id="divMemLabel" style="margin-left: 900px; margin-top: -572px;">
+       <label>
+           <b>Main Memory:</b>
+       </label>
+       <br>
+
+       <div id="divMemory" style="height:200px; width:290px; overflow:scroll; background-color:#FFFFFF;">
+            <div id="divMemTableArea"></div>
        </div>
-       <div id="divCPULabel" style="margin-left:4px; padding-bottom:10px">
-           <label>
-               <b>CPU:</b>
-           </label>
-           <br>
-           <div id="divCPU" style="margin-left:0px; height:38px; width:200px; background-color:#FFFFFF;">
-               <div id="divCPUTable"></div>
-           </div>
+   </div>
+
+   <div id="divCPULabel" style="margin-left:900px; margin-top: 20px;">
+       <label>
+           <b>CPU:</b>
+       </label>
+       <br>
+
+       <div id="divCPU" style="border: black 5px; height:38px; width:200px; background-color:#FFFFFF;">
+           <div id="divCPUTable"></div>
        </div>
-    </div>
+   </div>
+
 </div>
 
 <p class="footerText" style="clear:both;">

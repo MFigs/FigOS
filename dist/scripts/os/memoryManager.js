@@ -25,7 +25,9 @@ var TSOS;
 
         MemoryManager.prototype.storeMem = function (relativeAddress, valueToStore) {
             if (relativeAddress >= 0 && relativeAddress <= 255) {
-                _MemoryArray[relativeAddress + (_CurrentMemBlock * _MemBlockSize)] = valueToStore;
+                _MemoryArray.mem[relativeAddress + (_CurrentMemBlock * _MemBlockSize)] = valueToStore;
+                //_StdOut.putText(valueToStore);
+                //_StdOut.putText(_MemoryArray[relativeAddress + (_CurrentMemBlock * _MemBlockSize)]);
             } else {
                 // Kernel Error
             }
@@ -39,9 +41,9 @@ var TSOS;
             }
         };
 
-        MemoryManager.prototype.accessFullMem = function (relativeAddress) {
-            if (relativeAddress >= 0 && relativeAddress <= 767) {
-                return _MemoryArray.mem[relativeAddress];
+        MemoryManager.prototype.accessFullMem = function (address) {
+            if (address >= 0 && address <= 767) {
+                return _MemoryArray.mem[address];
             } else {
                 // Kernel Error
             }

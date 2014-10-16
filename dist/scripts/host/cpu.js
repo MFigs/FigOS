@@ -147,18 +147,18 @@ var TSOS;
             if (_SingleStepActive) {
                 var nextProgramStep;
                 nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
-                nextProgramStep.executeCommand();
+
+                _PrevPC = _CPU.PC;
+
+                if (_NextClicked) {
+                    nextProgramStep.executeCommand();
+                }
 
                 this.isExecuting = false;
             } else {
                 var nextProgramStep;
                 nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
                 nextProgramStep.executeCommand();
-            }
-
-            if (_IsProgramComplete == true) {
-                _ResidentPCBList[this.currentPID] = 0;
-                _IsProgramComplete = false;
             }
 
             _Kernel.updateState();

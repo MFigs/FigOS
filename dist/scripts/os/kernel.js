@@ -210,24 +210,24 @@ var TSOS;
             dataCell0.innerHTML = "" + _CPU.PC;
 
             var dataCell1 = document.getElementById("tdc1");
-            dataCell0.innerHTML = _Kernel.memManager.accessMem(_CPU.PC);
+            dataCell1.innerHTML = _Kernel.memManager.accessMem(_PrevPC);
 
             var dataCell2 = document.getElementById("tdc2");
-            dataCell0.innerHTML = "" + _CPU.Acc;
+            dataCell2.innerHTML = "" + _CPU.Acc;
 
             var dataCell3 = document.getElementById("tdc3");
-            dataCell0.innerHTML = "" + _CPU.Xreg;
+            dataCell3.innerHTML = "" + _CPU.Xreg;
 
             var dataCell4 = document.getElementById("tdc4");
-            dataCell0.innerHTML = "" + _CPU.Yreg;
+            dataCell4.innerHTML = "" + _CPU.Yreg;
 
             var dataCell5 = document.getElementById("tdc5");
-            dataCell0.innerHTML = "" + _CPU.Zflag;
+            dataCell5.innerHTML = "" + _CPU.Zflag;
         };
 
         Kernel.prototype.updateState = function () {
-            _Kernel.memManager.updateMem();
-            _Kernel.updateCPU();
+            this.memManager.updateMem();
+            this.updateCPU();
         };
         return Kernel;
     })();

@@ -439,10 +439,11 @@ module TSOS {
         public shellRun(pid: number) {
 
             if (_ResidentPCBList[pid] == 1) {
-                _StdOut.putText("pcb found");
+                //_StdOut.putText("pcb found");
                 _CPU.currentPID = pid;
                 _CPU.loadCPU(_PCBArray[_CPU.currentPID]);
-                _StdOut.putText("CPU loaded");
+                _ActiveProgramExists = true;
+                //_StdOut.putText("CPU loaded");
                 _CPU.isExecuting = true;
             }
 

@@ -657,7 +657,12 @@ var TSOS;
                 case "8D": {
                     // Store the Accumulator in memory
                     var address = this.translateAddressFromHexString(this.arg2 + this.arg1);
-                    _Kernel.memManager.storeMem(address, this.translateToHexString(_CPU.Acc));
+
+                    //_StdOut.putText("Adr: " + address + " ");
+                    var storeVal = this.translateToHexString(_CPU.Acc);
+
+                    //_StdOut.putText(storeVal);
+                    _Kernel.memManager.storeMem(address, storeVal);
                     _CPU.PC += 3;
                     _PCBArray[_CPU.currentPID].progCounter = _CPU.PC;
                     break;
@@ -712,8 +717,24 @@ var TSOS;
                 }
                 case "00": {
                     // Break from program
+                    _CPU.PC += 1;
+                    _PCBArray[_CPU.currentPID].progCounter = _CPU.PC;
+
                     _CPU.isExecuting = false;
-                    _IsProgramComplete = true;
+                    _ActiveProgramExists = false;
+
+                    _StdOut.advanceLine();
+                    _StdOut.putText("PID: " + _PCBArray[_CPU.currentPID].PID);
+                    _StdOut.advanceLine();
+                    _StdOut.putText("PC: " + _PCBArray[_CPU.currentPID].progCounter);
+                    _StdOut.advanceLine();
+                    _StdOut.putText("ACC: " + _PCBArray[_CPU.currentPID].accum);
+                    _StdOut.advanceLine();
+                    _StdOut.putText("X Reg: " + _PCBArray[_CPU.currentPID].xReg);
+                    _StdOut.advanceLine();
+                    _StdOut.putText("Y Reg: " + _PCBArray[_CPU.currentPID].yReg);
+                    _StdOut.advanceLine();
+                    _StdOut.putText("Z Flag: " + _PCBArray[_CPU.currentPID].zFlag);
                     break;
                 }
                 case "EC": {
@@ -745,8 +766,11 @@ var TSOS;
                 case "EE": {
                     // Increment the value of a byte
                     // TODO: Check Memory Bounds
-                    var incrementedByteValue = this.translateFromHexString(_Kernel.memManager.accessMem(this.translateAddressFromHexString(this.arg2 + this.arg1))) + 1;
-                    _Kernel.memManager.storeMem(this.translateFromHexString(this.arg2 + this.arg1), this.translateToHexString(incrementedByteValue));
+                    var byteValue = this.translateFromHexString(_Kernel.memManager.accessMem(this.translateAddressFromHexString(this.arg2 + this.arg1)));
+                    _StdOut.putText(byteValue);
+                    byteValue += 1;
+                    _StdOut.putText(byteValue);
+                    _Kernel.memManager.storeMem(this.translateFromHexString(this.arg2 + this.arg1), this.translateToHexString(byteValue));
                     _CPU.PC += 3;
                     _PCBArray[_CPU.currentPID].progCounter = _CPU.PC;
                     break;
@@ -757,16 +781,25 @@ var TSOS;
                     if (_CPU.Xreg === 1) {
                         var output = "" + _CPU.Yreg;
                         _StdOut.putText(output);
-                        _CPU.PC += 1;
-                        _PCBArray[_CPU.currentPID].progCounter = _CPU.PC;
-                        break;
                     } else if (_CPU.Xreg === 2) {
-                        var output = "" + _Kernel.memManager.accessMem(_CPU.Yreg);
-                        _StdOut.putText(output);
-                        _CPU.PC += 1;
-                        _PCBArray[_CPU.currentPID].progCounter = _CPU.PC;
-                        break;
+                        var tempPCPointer = _CPU.Yreg;
+                        var cellData = _Kernel.memManager.accessMem(tempPCPointer);
+                        var outputStr = "";
+
+                        while (cellData != "00") {
+                            var convertedData = String.fromCharCode(this.translateFromHexString(cellData));
+                            outputStr = outputStr + convertedData;
+                            tempPCPointer += 1;
+                            cellData = _Kernel.memManager.accessMem(tempPCPointer);
+                            _StdOut.putText("stuck?");
+                        }
+
+                        _StdOut.putText(outputStr);
                     }
+
+                    _CPU.PC += 1;
+                    _PCBArray[_CPU.currentPID].progCounter = _CPU.PC;
+
                     break;
                 }
             }

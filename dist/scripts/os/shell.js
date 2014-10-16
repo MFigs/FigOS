@@ -399,10 +399,12 @@ var TSOS;
 
         Shell.prototype.shellRun = function (pid) {
             if (_ResidentPCBList[pid] == 1) {
-                _StdOut.putText("pcb found");
+                //_StdOut.putText("pcb found");
                 _CPU.currentPID = pid;
                 _CPU.loadCPU(_PCBArray[_CPU.currentPID]);
-                _StdOut.putText("CPU loaded");
+                _ActiveProgramExists = true;
+
+                //_StdOut.putText("CPU loaded");
                 _CPU.isExecuting = true;
             } else {
                 _StdOut.putText("Program referenced is not loaded, please load the program or reference a valid PID");

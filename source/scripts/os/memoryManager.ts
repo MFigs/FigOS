@@ -34,7 +34,10 @@ module TSOS {
 
             if (relativeAddress >= 0 && relativeAddress <= 255) {
 
-                _MemoryArray[relativeAddress + (_CurrentMemBlock * _MemBlockSize)] = valueToStore;
+                _MemoryArray.mem[relativeAddress + (_CurrentMemBlock * _MemBlockSize)] = valueToStore;
+
+                //_StdOut.putText(valueToStore);
+                //_StdOut.putText(_MemoryArray[relativeAddress + (_CurrentMemBlock * _MemBlockSize)]);
 
             }
 
@@ -62,11 +65,11 @@ module TSOS {
 
         }
 
-        public accessFullMem(relativeAddress: number): string {
+        public accessFullMem(address: number): string {
 
-            if (relativeAddress >= 0 && relativeAddress <= 767) {
+            if (address >= 0 && address <= 767) {
 
-                return _MemoryArray.mem[relativeAddress];
+                return _MemoryArray.mem[address];
 
             }
 
