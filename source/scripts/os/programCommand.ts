@@ -161,7 +161,7 @@ module TSOS {
                 case 'A': {decimalValue += 160; break;}
                 case 'B': {decimalValue += 176; break;}
                 case 'C': {decimalValue += 192; break;}
-                case 'D': {decimalValue += 1208; break;}
+                case 'D': {decimalValue += 208; break;}
                 case 'E': {decimalValue += 224; break;}
                 case 'F': {decimalValue += 240; break;}
             }
@@ -393,6 +393,8 @@ module TSOS {
                     _StdOut.putText("Y Reg: " + _PCBArray[_CPU.currentPID].yReg);
                     _StdOut.advanceLine();
                     _StdOut.putText("Z Flag: " + _PCBArray[_CPU.currentPID].zFlag);
+                    _StdOut.advanceLine();
+                    _StdOut.putText(_PromptStr);
                     break;
                 }
                 case "EC":
@@ -414,10 +416,11 @@ module TSOS {
                 {
                     // Branch # of bytes if z flag is set to zero
                     if (_CPU.Zflag === 0) {
+                        _CPU.PC += 2;
                         var memLocJumped = (_CPU.PC + this.translateFromHexString(this.arg1)) % 256;
                         _CPU.PC = memLocJumped;
                         _PCBArray[_CPU.currentPID].progCounter = _CPU.PC;
-                        //_CPU.PC += 2;   ???
+
                     }
                     else {
                         _CPU.PC += 2;
@@ -430,11 +433,11 @@ module TSOS {
                     // Increment the value of a byte
                     // TODO: Check Memory Bounds
 
-                    var byteValue = this.translateFromHexString(_Kernel.memManager.accessMem(this.translateAddressFromHexString(this.arg2 + this.arg1)));
-                    _StdOut.putText(byteValue);
+                    var byteValue: number = this.translateFromHexString(_Kernel.memManager.accessMem(this.translateAddressFromHexString(this.arg2 + this.arg1)));
+                    //_StdOut.putText("" + byteValue);
                     byteValue += 1;
-                    _StdOut.putText(byteValue);
-                    _Kernel.memManager.storeMem(this.translateFromHexString(this.arg2 + this.arg1), this.translateToHexString(byteValue));
+                    //_StdOut.putText("" + byteValue);
+                    _Kernel.memManager.storeMem(this.translateAddressFromHexString(this.arg2 + this.arg1), this.translateToHexString(byteValue));
                     _CPU.PC += 3;
                     _PCBArray[_CPU.currentPID].progCounter = _CPU.PC;
                     break;
@@ -461,7 +464,7 @@ module TSOS {
                             outputStr = outputStr + convertedData;
                             tempPCPointer += 1;
                             cellData = _Kernel.memManager.accessMem(tempPCPointer);
-                            _StdOut.putText("stuck?");
+                            //_StdOut.putText("stuck?");
 
                         }
 

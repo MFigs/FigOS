@@ -4,6 +4,8 @@ var TSOS;
         function MemoryManager() {
         }
         MemoryManager.prototype.loadMem = function (blockNumber, inputProgram) {
+            this.clearMem();
+
             var memLoc = blockNumber * _MemBlockSize;
 
             var len = inputProgram.length;

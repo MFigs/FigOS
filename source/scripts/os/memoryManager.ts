@@ -7,6 +7,8 @@ module TSOS {
 
         public loadMem(blockNumber: number, inputProgram: string): void {
 
+            this.clearMem();
+
             var memLoc = blockNumber * _MemBlockSize;
 
             var len = inputProgram.length;
