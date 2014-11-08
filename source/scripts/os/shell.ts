@@ -121,6 +121,42 @@ module TSOS {
                 "<number> - Allows user to run a program loaded in memory, specified by Process ID.");
             this.commandList[this.commandList.length] = sc;
 
+            //clearmem
+            sc = new ShellCommand(this.shellClearMem,
+                "clearmem",
+                "- Clears all segments of memory.");
+            this.commandList[this.commandList.length] = sc;
+
+            //runall
+            sc = new ShellCommand(this.shellRunAll,
+                "runall",
+                "- Runs all currently loaded processes/programs.");
+            this.commandList[this.commandList.length] = sc;
+
+            //quantum <number>
+            sc = new ShellCommand(this.shellQuantum,
+                "quantum",
+                "<number> - Allows user to adjust the quantum used for Round Robin process scheduling.");
+            this.commandList[this.commandList.length] = sc;
+
+            //kill <number>
+            sc = new ShellCommand(this.shellKill,
+                "kill",
+                "<number> - Allows user to terminate a program by passing in the process ID of the program to terminate.");
+            this.commandList[this.commandList.length] = sc;
+
+            //killall
+            sc = new ShellCommand(this.shellKillAll,
+                "killall",
+                "- Allows user to terminate all active processes.");
+            this.commandList[this.commandList.length] = sc;
+
+            //ps
+            sc = new ShellCommand(this.shellPS,
+                "ps",
+                "- Displays all currently active processes.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -438,10 +474,9 @@ module TSOS {
 
         public shellRun(pid: number) {
 
-            if (_ResidentPCBList[pid] == 1) {
+            if ((_ResidentPCBList[pid] === 1) || (_ResidentPCBList[pid] === 2) || (_ResidentPCBList[pid] === 3)) {
                 //_StdOut.putText("pcb found");
-                _CPU.currentPID = pid;
-                _CPU.loadCPU(_PCBArray[_CPU.currentPID]);
+                _CPU.loadCPU(_PCBArray[pid]);
                 _ActiveProgramExists = true;
                 //_StdOut.putText("CPU loaded");
                 _CPU.isExecuting = true;
@@ -449,6 +484,75 @@ module TSOS {
 
             else {
                 _StdOut.putText("Program referenced is not loaded, please load the program or reference a valid PID");
+            }
+
+        }
+
+        public shellClearMem() {
+
+            _MemoryArray.clearMem();
+
+        }
+
+        public shellQuantum(q: number) {
+
+            _Quantum = q;
+
+        }
+
+        public shellKill(pid: number) {
+
+            if (_CPU.currentPID === pid) {
+                _ProcessScheduler.contextSwitchDrop();
+            }
+            else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3)) {
+                _StdOut.putText("Invalid Process ID specified in kill command...");
+            }
+            else {
+                for (var k: number = 0; k < _ReadyQueue.getSize(); k++) {
+                    var pcb: TSOS.ProcessControlBlock = _ReadyQueue.q[k];
+                    if (pcb.PID === pid) {
+                        _ReadyQueue.q.splice(k, 1);
+                    }
+                }
+            }
+
+        }
+
+        public shellKillAll() {
+
+            _CPU.isExecuting = false;
+            _ReadyQueue.clearQueue();
+
+        }
+
+        public shellRunAll() {
+
+            //TODO: Make this more abstract to support multiple load/run cycles
+
+            for (var j: number = 0; j < _ResidentPCBList.length; j++) {
+                if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3)) {
+                    _ReadyQueue.enqueue(_PCBArray[j]);
+                }
+            }
+
+            _CPU.isExecuting = true;
+
+        }
+
+        public shellPS() {
+
+            if (_CPU.isExecuting || _ActiveProgramExists) {
+
+                _StdOut.putText("Current Process Running: " + _CPU.currentPID);
+                _StdOut.purText("Active Processes: ");
+
+                for (var i: number = 0; i < _ReadyQueue.getSize(); i++) {
+
+                    var pcb: TSOS.ProcessControlBlock = _ReadyQueue.q[i];
+                    _StdOut.putText(pcb.PID);
+
+                }
             }
 
         }

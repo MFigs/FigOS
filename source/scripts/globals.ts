@@ -89,3 +89,7 @@ var _ActiveProgramExists: boolean = false;
 var _PrevPC: number = 0;
 
 var _ResidentPCBList: number[];
+var _ReadyQueue: TSOS.Queue;
+var _ProcessScheduler: TSOS.ProcessScheduler;
+
+var _Quantum: number = 6;

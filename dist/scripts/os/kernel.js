@@ -86,8 +86,14 @@ var TSOS;
             // Initiate Resident Process List
             _ResidentPCBList = [];
 
-            // Initiate PCB List
+            // Initiate Resident PCB List
             _PCBArray = [];
+
+            // Initiate Ready Queue
+            _ReadyQueue = new TSOS.Queue();
+
+            // Initialize the Process Scheduler
+            _ProcessScheduler = new TSOS.ProcessScheduler;
 
             // Finally, initiate testing.
             if (_GLaDOS) {

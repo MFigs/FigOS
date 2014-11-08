@@ -84,3 +84,7 @@ var _ActiveProgramExists = false;
 var _PrevPC = 0;
 
 var _ResidentPCBList;
+var _ReadyQueue;
+var _ProcessScheduler;
+
+var _Quantum = 6;

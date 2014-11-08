@@ -16,6 +16,12 @@ var TSOS;
             return this.q.length;
         };
 
+        Queue.prototype.clearQueue = function () {
+            for (var i = 0; i < this.getSize(); i++) {
+                this.dequeue();
+            }
+        };
+
         Queue.prototype.isEmpty = function () {
             return (this.q.length == 0);
         };

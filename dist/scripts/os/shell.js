@@ -85,6 +85,30 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellRun, "run", "<number> - Allows user to run a program loaded in memory, specified by Process ID.");
             this.commandList[this.commandList.length] = sc;
 
+            //clearmem
+            sc = new TSOS.ShellCommand(this.shellClearMem, "clearmem", "- Clears all segments of memory.");
+            this.commandList[this.commandList.length] = sc;
+
+            //runall
+            sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "- Runs all currently loaded processes/programs.");
+            this.commandList[this.commandList.length] = sc;
+
+            //quantum <number>
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "<number> - Allows user to adjust the quantum used for Round Robin process scheduling.");
+            this.commandList[this.commandList.length] = sc;
+
+            //kill <number>
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "<number> - Allows user to terminate a program by passing in the process ID of the program to terminate.");
+            this.commandList[this.commandList.length] = sc;
+
+            //killall
+            sc = new TSOS.ShellCommand(this.shellKillAll, "killall", "- Allows user to terminate all active processes.");
+            this.commandList[this.commandList.length] = sc;
+
+            //ps
+            sc = new TSOS.ShellCommand(this.shellPS, "ps", "- Displays all currently active processes.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -398,16 +422,65 @@ var TSOS;
         };
 
         Shell.prototype.shellRun = function (pid) {
-            if (_ResidentPCBList[pid] == 1) {
+            if ((_ResidentPCBList[pid] === 1) || (_ResidentPCBList[pid] === 2) || (_ResidentPCBList[pid] === 3)) {
                 //_StdOut.putText("pcb found");
-                _CPU.currentPID = pid;
-                _CPU.loadCPU(_PCBArray[_CPU.currentPID]);
+                _CPU.loadCPU(_PCBArray[pid]);
                 _ActiveProgramExists = true;
 
                 //_StdOut.putText("CPU loaded");
                 _CPU.isExecuting = true;
             } else {
                 _StdOut.putText("Program referenced is not loaded, please load the program or reference a valid PID");
+            }
+        };
+
+        Shell.prototype.shellClearMem = function () {
+            _MemoryArray.clearMem();
+        };
+
+        Shell.prototype.shellQuantum = function (q) {
+            _Quantum = q;
+        };
+
+        Shell.prototype.shellKill = function (pid) {
+            if (_CPU.currentPID === pid) {
+                _ProcessScheduler.contextSwitchDrop();
+            } else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3)) {
+                _StdOut.putText("Invalid Process ID specified in kill command...");
+            } else {
+                for (var k = 0; k < _ReadyQueue.getSize(); k++) {
+                    var pcb = _ReadyQueue.q[k];
+                    if (pcb.PID === pid) {
+                        _ReadyQueue.q.splice(k, 1);
+                    }
+                }
+            }
+        };
+
+        Shell.prototype.shellKillAll = function () {
+            _CPU.isExecuting = false;
+            _ReadyQueue.clearQueue();
+        };
+
+        Shell.prototype.shellRunAll = function () {
+            for (var j = 0; j < _ResidentPCBList.length; j++) {
+                if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3)) {
+                    _ReadyQueue.enqueue(_PCBArray[j]);
+                }
+            }
+
+            _CPU.isExecuting = true;
+        };
+
+        Shell.prototype.shellPS = function () {
+            if (_CPU.isExecuting || _ActiveProgramExists) {
+                _StdOut.putText("Current Process Running: " + _CPU.currentPID);
+                _StdOut.purText("Active Processes: ");
+
+                for (var i = 0; i < _ReadyQueue.getSize(); i++) {
+                    var pcb = _ReadyQueue.q[i];
+                    _StdOut.putText(pcb.PID);
+                }
             }
         };
         return Shell;

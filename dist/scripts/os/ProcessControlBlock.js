@@ -10,6 +10,7 @@ var TSOS;
             this.xReg = 0;
             this.yReg = 0;
             this.zFlag = 0;
+            this.quantumCycleCount = 0;
         }
         return ProcessControlBlock;
     })();

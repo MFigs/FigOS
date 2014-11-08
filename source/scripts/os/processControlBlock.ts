@@ -12,6 +12,7 @@ module TSOS {
         public xReg: number;
         public yReg: number;
         public zFlag: number;
+        public quantumCycleCount: number;
 
         constructor() {
 
@@ -23,6 +24,7 @@ module TSOS {
             this.xReg = 0;
             this.yReg = 0;
             this.zFlag = 0;
+            this.quantumCycleCount = 0;
 
         }
 
