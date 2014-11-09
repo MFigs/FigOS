@@ -503,7 +503,7 @@ module TSOS {
         public shellKill(pid: number) {
 
             if (_CPU.currentPID === pid) {
-                _ProcessScheduler.contextSwitchDrop();
+               _KernelInterruptQueue.enqueue(new Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
             }
             else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3)) {
                 _StdOut.putText("Invalid Process ID specified in kill command...");

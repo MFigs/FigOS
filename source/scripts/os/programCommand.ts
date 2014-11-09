@@ -379,7 +379,9 @@ module TSOS {
                     _PCBArray[_CPU.currentPID].progCounter = _CPU.PC;
 
                     _CPU.isExecuting = false;
-                    _ActiveProgramExists = false;
+
+                    if (_ReadyQueue.isEmpty())
+                        _ActiveProgramExists = false;
 
                     _StdOut.advanceLine();
                     _StdOut.putText("PID: " + _PCBArray[_CPU.currentPID].PID);

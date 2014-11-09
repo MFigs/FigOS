@@ -70,6 +70,10 @@ module TSOS {
             _StdIn  = _Console;
             _StdOut = _Console;
 
+            _Display = new TSOS.Display();
+
+            _Display.displayCPU();
+
             this.updateState();
 
             // Load the Keyboard Device Driver
@@ -175,6 +179,9 @@ module TSOS {
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case TIMER_KILL_ACTIVE_IRQ:
+                    this.krnTimerKillActiveProcISR();
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -183,6 +190,15 @@ module TSOS {
         public krnTimerISR() {
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+
+            _ProcessScheduler.contextSwitch();
+
+        }
+
+        public krnTimerKillActiveProcISR() {
+
+        _ProcessScheduler.contextSwitchDrop();
+
         }
 
         //
@@ -226,31 +242,11 @@ module TSOS {
             this.krnShutdown();
         }
 
-        public updateCPU() {
 
-            var dataCell0 = document.getElementById("tdc0");
-            dataCell0.innerHTML = "" + _CPU.PC;
-
-            var dataCell1 = document.getElementById("tdc1");
-            dataCell1.innerHTML = _Kernel.memManager.accessMem(_PrevPC);
-
-            var dataCell2 = document.getElementById("tdc2");
-            dataCell2.innerHTML = "" + _CPU.Acc;
-
-            var dataCell3 = document.getElementById("tdc3");
-            dataCell3.innerHTML = "" + _CPU.Xreg;
-
-            var dataCell4 = document.getElementById("tdc4");
-            dataCell4.innerHTML = "" + _CPU.Yreg;
-
-            var dataCell5 = document.getElementById("tdc5");
-            dataCell5.innerHTML = "" + _CPU.Zflag;
-
-        }
 
         public updateState() {
             this.memManager.updateMem();
-            this.updateCPU();
+            _Display.updateCPU();
         }
 
     }

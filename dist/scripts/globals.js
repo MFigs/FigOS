@@ -19,11 +19,15 @@ var TIMER_IRQ = 0;
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
 
+var TIMER_KILL_ACTIVE_IRQ = 2;
+
 //
 // Global Variables
 //
 var _CPU;
 var _PCBArray;
+
+var _Display;
 
 var _OSclock = 0;
 

@@ -21,12 +21,16 @@ var TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interr
                             // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ: number = 1;
 
+var TIMER_KILL_ACTIVE_IRQ: number = 2;
+
 
 //
 // Global Variables
 //
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _PCBArray: TSOS.ProcessControlBlock[];
+
+var _Display: TSOS.Display;
 
 var _OSclock: number = 0;  // Page 23.
 
