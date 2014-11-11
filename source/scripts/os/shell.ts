@@ -614,7 +614,7 @@ module TSOS {
 
                 _StdOut.putText("Current Process Running: " + _CPU.currentPID);
                 _StdOut.advanceLine();
-                _StdOut.putText("Active Processes: ");
+                _StdOut.putText("Other Active Processes: ");
                 _StdOut.advanceLine();
 
                 for (var i: number = 0; i < _ReadyQueue.q.length; i++) {
