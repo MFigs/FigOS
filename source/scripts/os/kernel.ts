@@ -27,8 +27,17 @@ module TSOS {
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
             _Console = new Console();          // The command line interface / console I/O device.
 
+            // Initiate Ready Queue
+            _ReadyQueue = new TSOS.Queue();
+
             // Initialize the console.
             _Console.init();
+
+            _Display = new TSOS.Display();
+
+            _MemLoadedTable = [];
+            for (var i = 0; i < 3; i++)
+                _MemLoadedTable[i] = 0;
 
             //TODO: Replace current multi-variable time format below, possible simplified implementation of date/time formatting that already exists
 
@@ -70,6 +79,7 @@ module TSOS {
             _StdIn  = _Console;
             _StdOut = _Console;
 
+
             this.updateState();
 
             // Load the Keyboard Device Driver
@@ -94,8 +104,13 @@ module TSOS {
             // Initiate Resident Process List
             _ResidentPCBList = [];
 
-            // Initiate PCB List
+            // Initiate Resident PCB List
             _PCBArray = [];
+
+            _TerminatedProcessList = [];
+
+            // Initialize the Process Scheduler
+            _ProcessScheduler = new TSOS.ProcessScheduler;
 
             // Finally, initiate testing.
             if (_GLaDOS) {
@@ -133,6 +148,7 @@ module TSOS {
                 _CPU.cycle();
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
+                this.updateState();
             }
         }
 
@@ -169,6 +185,9 @@ module TSOS {
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case TIMER_KILL_ACTIVE_IRQ:
+                    this.krnTimerKillActiveProcISR();
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -177,6 +196,15 @@ module TSOS {
         public krnTimerISR() {
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+
+            _ProcessScheduler.contextSwitch();
+
+        }
+
+        public krnTimerKillActiveProcISR() {
+
+        _ProcessScheduler.contextSwitchDrop();
+
         }
 
         //
@@ -220,31 +248,12 @@ module TSOS {
             this.krnShutdown();
         }
 
-        public updateCPU() {
 
-            var dataCell0 = document.getElementById("tdc0");
-            dataCell0.innerHTML = "" + _CPU.PC;
-
-            var dataCell1 = document.getElementById("tdc1");
-            dataCell1.innerHTML = _Kernel.memManager.accessMem(_PrevPC);
-
-            var dataCell2 = document.getElementById("tdc2");
-            dataCell2.innerHTML = "" + _CPU.Acc;
-
-            var dataCell3 = document.getElementById("tdc3");
-            dataCell3.innerHTML = "" + _CPU.Xreg;
-
-            var dataCell4 = document.getElementById("tdc4");
-            dataCell4.innerHTML = "" + _CPU.Yreg;
-
-            var dataCell5 = document.getElementById("tdc5");
-            dataCell5.innerHTML = "" + _CPU.Zflag;
-
-        }
 
         public updateState() {
             this.memManager.updateMem();
-            this.updateCPU();
+            _Display.updateCPU();
+            _Display.updateRQ();
         }
 
     }

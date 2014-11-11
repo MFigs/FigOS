@@ -121,6 +121,42 @@ module TSOS {
                 "<number> - Allows user to run a program loaded in memory, specified by Process ID.");
             this.commandList[this.commandList.length] = sc;
 
+            //clearmem
+            sc = new ShellCommand(this.shellClearMem,
+                "clearmem",
+                "- Clears all segments of memory.");
+            this.commandList[this.commandList.length] = sc;
+
+            //runall
+            sc = new ShellCommand(this.shellRunAll,
+                "runall",
+                "- Runs all currently loaded processes/programs.");
+            this.commandList[this.commandList.length] = sc;
+
+            //quantum <number>
+            sc = new ShellCommand(this.shellQuantum,
+                "quantum",
+                "<number> - Allows user to adjust the quantum used for Round Robin process scheduling.");
+            this.commandList[this.commandList.length] = sc;
+
+            //kill <number>
+            sc = new ShellCommand(this.shellKill,
+                "kill",
+                "<number> - Allows user to terminate a program by passing in the process ID of the program to terminate.");
+            this.commandList[this.commandList.length] = sc;
+
+            //killall
+            sc = new ShellCommand(this.shellKillAll,
+                "killall",
+                "- Allows user to terminate all active processes.");
+            this.commandList[this.commandList.length] = sc;
+
+            //ps
+            sc = new ShellCommand(this.shellPS,
+                "ps",
+                "- Displays all currently active processes.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -396,40 +432,71 @@ module TSOS {
 
         public shellLoad() {
 
-                var programTextElem = <HTMLInputElement> document.getElementById("taProgramInput");
-                var programStr: string = programTextElem.value.toString();
-                programStr = programStr.replace(/\s/g, "");
+            var programTextElem = <HTMLInputElement> document.getElementById("taProgramInput");
+            var programStr:string = programTextElem.value.toString();
+            programStr = programStr.replace(/\s/g, "");
 
-            if(programStr.length > 0) {
+            if ((_MemLoadedTable[0] === 1) && (_MemLoadedTable[1] === 1) && (_MemLoadedTable[2] === 1)) {
 
-                var isValidHex = true;
-                var textCount = 0;
-                if (programStr.length > 0) {
-                    while (isValidHex && (textCount < programStr.length)) {
-                        var chkChr = programStr.charCodeAt(textCount);
-                        if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
-                            textCount++;
+                _StdOut.putText("Memory is Full... Please Clear Memory and Load Program Again...");
+
+            }
+
+            else {
+
+                var prevMemBlock = _CurrentMemBlock;
+
+                if (_MemLoadedTable[0] === 0) {
+                    _CurrentMemBlock = 0;
+                    _MemLoadedTable[_CurrentMemBlock] = 1;
+                }
+                else if (_MemLoadedTable[1] === 0) {
+                    _CurrentMemBlock = 1;
+                    _MemLoadedTable[_CurrentMemBlock] = 1;
+                }
+                else if (_MemLoadedTable[2] === 0) {
+                    _CurrentMemBlock = 2;
+                    _MemLoadedTable[_CurrentMemBlock] = 1;
+                }
+
+                if(programStr.length > 0) {
+
+                    var isValidHex = true;
+                    var textCount = 0;
+                    if (programStr.length > 0) {
+                        while (isValidHex && (textCount < programStr.length)) {
+                            var chkChr = programStr.charCodeAt(textCount);
+                            if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
+                                textCount++;
+                            }
+                            else {
+                                isValidHex = false;
+                            }
+                        }
+                        if (isValidHex) {
+                            _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
+                            var pcb = new ProcessControlBlock();
+                            _PCBArray[pcb.PID] = pcb;
+                            _ResidentPCBList[pcb.PID] = _CurrentMemBlock + 1;
+                            _TerminatedProcessList[pcb.PID] = 0;
+                            _StdOut.putText("Loaded Program: PID " + pcb.PID);
+                            _Kernel.memManager.updateMem();
                         }
                         else {
-                            isValidHex = false;
+                            _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
+                            _MemLoadedTable[_CurrentMemBlock] = 0;
+                            _CurrentMemBlock = prevMemBlock;
                         }
                     }
-                    if (isValidHex) {
-                       _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
-                        var pcb = new ProcessControlBlock();
-                        _PCBArray[pcb.PID] = pcb;
-                        _ResidentPCBList[pcb.PID] = 1;
-                        _StdOut.putText("Loaded Program: PID " + pcb.PID);
-                        _Kernel.memManager.updateMem();
-                    }
                     else {
-                        _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
+                        _StdOut.putText("NO PROGRAM TO LOAD");
+                        _MemLoadedTable[_CurrentMemBlock] = 0;
+                        _CurrentMemBlock = prevMemBlock;
                     }
                 }
-                else {
-                    _StdOut.putText("NO PROGRAM TO LOAD");
-                }
+
             }
+
         }
 
         public shellBSOD() {
@@ -438,17 +505,123 @@ module TSOS {
 
         public shellRun(pid: number) {
 
-            if (_ResidentPCBList[pid] == 1) {
+            if ((_ResidentPCBList[pid] === 1) || (_ResidentPCBList[pid] === 2) || (_ResidentPCBList[pid] === 3)) {
                 //_StdOut.putText("pcb found");
-                _CPU.currentPID = pid;
-                _CPU.loadCPU(_PCBArray[_CPU.currentPID]);
+                //_CPU.loadCPU(_PCBArray[pid]);
+                _PCBArray[pid].updateStatus("Ready");
+                _PCBArray[pid].updateLoc();
+                _ReadyQueue.enqueue(_PCBArray[pid]);
+                _ProcessScheduler.programCount += 1;
+                _TerminatedProcessList[pid] = 0;
                 _ActiveProgramExists = true;
                 //_StdOut.putText("CPU loaded");
+
+                if(!_CPU.isExecuting) {
+
+                    var pcb: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
+                    _CurrentMemBlock = _ResidentPCBList[pcb.PID] - 1;
+                    _CPU.loadCPU(pcb);
+
+                }
                 _CPU.isExecuting = true;
             }
 
             else {
                 _StdOut.putText("Program referenced is not loaded, please load the program or reference a valid PID");
+            }
+
+        }
+
+        public shellClearMem() {
+
+            _Kernel.memManager.clearMem();
+
+        }
+
+        public shellQuantum(q: number) {
+
+            _Quantum = q;
+
+        }
+
+        public shellKill(pid: number) {
+
+            if (_CPU.currentPID === pid) {
+               _KernelInterruptQueue.enqueue(new Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
+               _PCBArray[pid].procStatus = "Terminated";
+                _TerminatedProcessList[pid] = 1;
+            }
+            else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3)) {
+                _StdOut.putText("Invalid Process ID specified in kill command...");
+            }
+            else {
+                _TerminatedProcessList[pid] = 1;
+            }
+
+        }
+
+        public shellKillAll() {
+
+            _CPU.isExecuting = false;
+
+            for (var i = 0; i < _PCBArray.length; i++) {
+                if ((_PCBArray[i].procStatus === "Ready") || (_PCBArray[i].procStatus === "Running")) {
+                    _PCBArray[i].procStatus = "Terminated";
+                    _TerminatedProcessList[i] = 1;
+                }
+            }
+
+            _ReadyQueue.clearQueue();
+            _ProcessScheduler.programCount = 0;
+
+        }
+
+        public shellRunAll() {
+
+            //TODO: Make this more abstract to support multiple load/run cycles
+
+            var minActivePID: number = 999;
+
+            for (var j: number = 0; j < _ResidentPCBList.length; j++) {
+                if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3)) {
+                    _PCBArray[j].updateStatus("Ready");
+                    _PCBArray[j].updateLoc();
+                    _ReadyQueue.enqueue(_PCBArray[j]);
+                    _TerminatedProcessList[j] = 0;
+                    _ProcessScheduler.programCount += 1;
+
+                    if (j < minActivePID)
+                        minActivePID = j;
+                }
+            }
+
+            if(!_CPU.isExecuting) {
+
+                var pcb: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
+                _CurrentMemBlock = _ResidentPCBList[minActivePID] - 1;
+                _CPU.loadCPU(pcb);
+
+            }
+
+            _CPU.isExecuting = true;
+
+        }
+
+        public shellPS() {
+
+            if (_CPU.isExecuting || _ActiveProgramExists) {
+
+                _StdOut.putText("Current Process Running: " + _CPU.currentPID);
+                _StdOut.advanceLine();
+                _StdOut.putText("Other Active Processes: ");
+                _StdOut.advanceLine();
+
+                for (var i: number = 0; i < _ReadyQueue.q.length; i++) {
+
+                    var pcb: TSOS.ProcessControlBlock = _ReadyQueue.q[i];
+                    _StdOut.putText(pcb.PID + " ");
+
+                }
             }
 
         }

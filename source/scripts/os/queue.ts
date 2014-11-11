@@ -18,6 +18,16 @@ module TSOS {
             return this.q.length;
         }
 
+        public clearQueue() {
+
+            for (var i: number = 0; i < this.getSize(); i++) {
+
+                this.dequeue();
+
+            }
+
+        }
+
         public isEmpty(){
             return (this.q.length == 0);
         }

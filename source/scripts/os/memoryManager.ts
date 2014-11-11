@@ -7,12 +7,14 @@ module TSOS {
 
         public loadMem(blockNumber: number, inputProgram: string): void {
 
-            this.clearMem();
+            //this.clearMem();
 
             var memLoc = blockNumber * _MemBlockSize;
 
             var len = inputProgram.length;
             var loadString = inputProgram;
+
+            //console.log(memLoc);
 
             for (var j = 0; j < len/2; j++) {
 
@@ -22,14 +24,16 @@ module TSOS {
                 _MemoryArray.mem[memLoc] = loadValue;
                 memLoc++;
 
-                // Add Memory Bound Check Above Block
-
             }
 
         }
 
         public clearMem(): void {
             _MemoryArray.clearMem();
+            for (var i = 0; i < 3; i++)
+                _MemLoadedTable[i] = 0;
+            for (var j = 0; j < _ResidentPCBList.length; j++)
+                _ResidentPCBList[j] = 0;
         }
 
         public storeMem(relativeAddress: number, valueToStore: string): void {
@@ -38,14 +42,12 @@ module TSOS {
 
                 _MemoryArray.mem[relativeAddress + (_CurrentMemBlock * _MemBlockSize)] = valueToStore;
 
-                //_StdOut.putText(valueToStore);
-                //_StdOut.putText(_MemoryArray[relativeAddress + (_CurrentMemBlock * _MemBlockSize)]);
-
             }
 
             else {
 
-                // Kernel Error
+                _StdOut.putText("Error: Invalid Memory Store... Index Out of Bounds... Terminating Process...");
+                _KernelInterruptQueue.enqueue(new Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
 
             }
 
@@ -61,7 +63,8 @@ module TSOS {
 
             else {
 
-                // Kernel Error
+                _StdOut.putText("Error: Invalid Memory Access... Index Out of Bounds... Terminating Process...");
+                _KernelInterruptQueue.enqueue(new Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
 
             }
 
@@ -77,7 +80,8 @@ module TSOS {
 
             else {
 
-                // Kernel Error
+                _StdOut.putText("Error: Invalid Memory Access... Index Out of Bounds... Terminating Process...");
+                _KernelInterruptQueue.enqueue(new Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
 
             }
 

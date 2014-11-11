@@ -31,6 +31,8 @@
    <script type="text/javascript" src="dist/scripts/os/ProcessControlBlock.js"></script>
    <script type="text/javascript" src="dist/scripts/os/memoryManager.js"></script>
    <script type="text/javascript" src="dist/scripts/os/kernel.js"></script>
+   <script type="text/javascript" src="dist/scripts/os/display.js"></script>
+   <script type="text/javascript" src="dist/scripts/os/processScheduler.js"></script>
 
    <!-- Other Routines -->
    <script type="text/javascript" src="dist/scripts/utils.js"></script>
@@ -149,6 +151,33 @@
            <div id="divCPUTable"></div>
        </div>
    </div>
+
+    <div id="divRQLabel" style="margin-left:900px; margin-top: 20px;">
+        <label>
+            <b>Active Processes in Ready Queue:</b>
+        </label>
+        <br>
+
+        <div id="divRQ" style="border: black 5px; height:175px; width:390px; overflow:scroll; background-color:#FFFFFF;">
+            <div id="divRQTable">
+                <table id="rqTable">
+                    <thead>
+                        <tr>
+                            <td>PID</td>
+                            <td>PC</td>
+                            <td>IR</td>
+                            <td>ACC</td>
+                            <td>X</td>
+                            <td>Y</td>
+                            <td>Z</td>
+                            <td>State</td>
+                            <td>Location</td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
 
 </div>
 

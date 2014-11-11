@@ -23,8 +23,17 @@ var TSOS;
             _KernelInputQueue = new TSOS.Queue(); // Where device input lands before being processed out somewhere.
             _Console = new TSOS.Console(); // The command line interface / console I/O device.
 
+            // Initiate Ready Queue
+            _ReadyQueue = new TSOS.Queue();
+
             // Initialize the console.
             _Console.init();
+
+            _Display = new TSOS.Display();
+
+            _MemLoadedTable = [];
+            for (var i = 0; i < 3; i++)
+                _MemLoadedTable[i] = 0;
 
             //TODO: Replace current multi-variable time format below, possible simplified implementation of date/time formatting that already exists
             setInterval(function () {
@@ -86,8 +95,13 @@ var TSOS;
             // Initiate Resident Process List
             _ResidentPCBList = [];
 
-            // Initiate PCB List
+            // Initiate Resident PCB List
             _PCBArray = [];
+
+            _TerminatedProcessList = [];
+
+            // Initialize the Process Scheduler
+            _ProcessScheduler = new TSOS.ProcessScheduler;
 
             // Finally, initiate testing.
             if (_GLaDOS) {
@@ -125,6 +139,7 @@ var TSOS;
                 _CPU.cycle();
             } else {
                 this.krnTrace("Idle");
+                this.updateState();
             }
         };
 
@@ -156,6 +171,9 @@ var TSOS;
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case TIMER_KILL_ACTIVE_IRQ:
+                    this.krnTimerKillActiveProcISR();
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -164,6 +182,11 @@ var TSOS;
         Kernel.prototype.krnTimerISR = function () {
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+            _ProcessScheduler.contextSwitch();
+        };
+
+        Kernel.prototype.krnTimerKillActiveProcISR = function () {
+            _ProcessScheduler.contextSwitchDrop();
         };
 
         //
@@ -205,29 +228,10 @@ var TSOS;
             this.krnShutdown();
         };
 
-        Kernel.prototype.updateCPU = function () {
-            var dataCell0 = document.getElementById("tdc0");
-            dataCell0.innerHTML = "" + _CPU.PC;
-
-            var dataCell1 = document.getElementById("tdc1");
-            dataCell1.innerHTML = _Kernel.memManager.accessMem(_PrevPC);
-
-            var dataCell2 = document.getElementById("tdc2");
-            dataCell2.innerHTML = "" + _CPU.Acc;
-
-            var dataCell3 = document.getElementById("tdc3");
-            dataCell3.innerHTML = "" + _CPU.Xreg;
-
-            var dataCell4 = document.getElementById("tdc4");
-            dataCell4.innerHTML = "" + _CPU.Yreg;
-
-            var dataCell5 = document.getElementById("tdc5");
-            dataCell5.innerHTML = "" + _CPU.Zflag;
-        };
-
         Kernel.prototype.updateState = function () {
             this.memManager.updateMem();
-            this.updateCPU();
+            _Display.updateCPU();
+            _Display.updateRQ();
         };
         return Kernel;
     })();
