@@ -98,6 +98,8 @@ var TSOS;
             // Initiate Resident PCB List
             _PCBArray = [];
 
+            _TerminatedProcessList = [];
+
             // Initialize the Process Scheduler
             _ProcessScheduler = new TSOS.ProcessScheduler;
 

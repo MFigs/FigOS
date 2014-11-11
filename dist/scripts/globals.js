@@ -93,4 +93,6 @@ var _ResidentPCBList;
 var _ReadyQueue;
 var _ProcessScheduler;
 
+var _TerminatedProcessList;
+
 var _Quantum = 6;

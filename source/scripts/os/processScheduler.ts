@@ -42,6 +42,14 @@ module TSOS {
                 _PCBArray[_CPU.currentPID].procStatus = "Ready";
                 _ReadyQueue.enqueue(_PCBArray[_CPU.currentPID]);
                 var currPCB: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
+
+                /*while (_TerminatedProcessList[currPCB.PID] === 1) {
+
+                    currPCB.procStatus = "Terminated";
+                    currPCB = _ReadyQueue.dequeue();
+
+                }*/
+
                 _CurrentMemBlock =_ResidentPCBList[currPCB.PID] - 1;
                 currPCB.quantumCycleCount = 0;
                 currPCB.procStatus = "Running";
@@ -68,6 +76,18 @@ module TSOS {
                 _PCBArray[_CPU.currentPID].procStatus = "Terminated";
                 _ProcessScheduler.programCount -= 1;
                 var currPCB: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
+
+                /*while (_TerminatedProcessList[currPCB.PID] === 1) {
+
+                    if (_ReadyQueue.isEmpty())
+                        _CPU.isExecuting = false;
+
+                    currPCB.procStatus = "Terminated";
+                    currPCB = _ReadyQueue.dequeue();
+
+
+                }*/
+
                 _CurrentMemBlock =_ResidentPCBList[currPCB.PID] - 1;
                 currPCB.quantumCycleCount = 0;
                 _CPU.loadCPU(currPCB);

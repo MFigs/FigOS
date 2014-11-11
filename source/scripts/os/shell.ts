@@ -478,6 +478,7 @@ module TSOS {
                             var pcb = new ProcessControlBlock();
                             _PCBArray[pcb.PID] = pcb;
                             _ResidentPCBList[pcb.PID] = _CurrentMemBlock + 1;
+                            _TerminatedProcessList[pcb.PID] = 0;
                             _StdOut.putText("Loaded Program: PID " + pcb.PID);
                             _Kernel.memManager.updateMem();
                         }
@@ -511,6 +512,7 @@ module TSOS {
                 _PCBArray[pid].updateLoc();
                 _ReadyQueue.enqueue(_PCBArray[pid]);
                 _ProcessScheduler.programCount += 1;
+                _TerminatedProcessList[pid] = 0;
                 _ActiveProgramExists = true;
                 //_StdOut.putText("CPU loaded");
 
@@ -547,19 +549,13 @@ module TSOS {
             if (_CPU.currentPID === pid) {
                _KernelInterruptQueue.enqueue(new Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
                _PCBArray[pid].procStatus = "Terminated";
+                _TerminatedProcessList[pid] = 1;
             }
             else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3)) {
                 _StdOut.putText("Invalid Process ID specified in kill command...");
             }
             else {
-                for (var k: number = 0; k < _ReadyQueue.q.length; k++) {
-                    var pcb: TSOS.ProcessControlBlock = _ReadyQueue.q[k];
-                    if (pcb.PID === pid) {
-                        _PCBArray[pid].procStatus = "Terminated";
-                        _ReadyQueue.q.splice(k, 1);
-                        _ProcessScheduler.programCount -= 1;
-                    }
-                }
+                _TerminatedProcessList[pid] = 1;
             }
 
         }
@@ -569,8 +565,10 @@ module TSOS {
             _CPU.isExecuting = false;
 
             for (var i = 0; i < _PCBArray.length; i++) {
-                if ((_PCBArray[i].procStatus === "Ready") || (_PCBArray[i].procStatus === "Running"))
+                if ((_PCBArray[i].procStatus === "Ready") || (_PCBArray[i].procStatus === "Running")) {
                     _PCBArray[i].procStatus = "Terminated";
+                    _TerminatedProcessList[i] = 1;
+                }
             }
 
             _ReadyQueue.clearQueue();
@@ -589,6 +587,7 @@ module TSOS {
                     _PCBArray[j].updateStatus("Ready");
                     _PCBArray[j].updateLoc();
                     _ReadyQueue.enqueue(_PCBArray[j]);
+                    _TerminatedProcessList[j] = 0;
                     _ProcessScheduler.programCount += 1;
 
                     if (j < minActivePID)
@@ -599,7 +598,7 @@ module TSOS {
             if(!_CPU.isExecuting) {
 
                 var pcb: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
-                _CurrentMemBlock = _ResidentPCBList[j] - 1;
+                _CurrentMemBlock = _ResidentPCBList[minActivePID] - 1;
                 _CPU.loadCPU(pcb);
 
             }

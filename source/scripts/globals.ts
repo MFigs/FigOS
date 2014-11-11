@@ -98,4 +98,6 @@ var _ResidentPCBList: number[];
 var _ReadyQueue: TSOS.Queue;
 var _ProcessScheduler: TSOS.ProcessScheduler;
 
+var _TerminatedProcessList: number[];
+
 var _Quantum: number = 6;
