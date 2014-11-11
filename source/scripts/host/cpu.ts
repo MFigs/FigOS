@@ -25,7 +25,9 @@ module TSOS {
                     public Yreg: number = 0,
                     public Zflag: number = 0,
                     public currentPID: number = 0,
-                    public isExecuting: boolean = false) {
+                    public isExecuting: boolean = false,
+                    public base: number = 0,
+                    public limit: number = 0) {
 
         }
 
@@ -37,6 +39,9 @@ module TSOS {
             this.Zflag = 0;
             this.isExecuting = false;
             this.currentPID = 0;
+            this.isExecuting = false;
+            this.base = 0;
+            this.limit = 0;
         }
 
         public loadCPU(pcb: ProcessControlBlock) {
@@ -47,6 +52,8 @@ module TSOS {
             this.Yreg = pcb.yReg;
             this.Zflag = pcb.zFlag;
             this.currentPID = pcb.PID;
+            this.base = pcb.base;
+            this.limit = pcb.limit;
 
         }
 

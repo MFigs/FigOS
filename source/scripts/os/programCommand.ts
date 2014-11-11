@@ -378,12 +378,11 @@ module TSOS {
                     _CPU.PC += 1;
                     _PCBArray[_CPU.currentPID].progCounter = _CPU.PC;
 
-                    _CPU.isExecuting = false;
 
                     if (_ReadyQueue.isEmpty())
                         _ActiveProgramExists = false;
 
-                    _StdOut.advanceLine();
+                    /*_StdOut.advanceLine();
                     _StdOut.putText("PID: " + _PCBArray[_CPU.currentPID].PID);
                     _StdOut.advanceLine();
                     _StdOut.putText("PC: " + _PCBArray[_CPU.currentPID].progCounter);
@@ -396,7 +395,10 @@ module TSOS {
                     _StdOut.advanceLine();
                     _StdOut.putText("Z Flag: " + _PCBArray[_CPU.currentPID].zFlag);
                     _StdOut.advanceLine();
-                    _StdOut.putText(_PromptStr);
+                    _StdOut.putText(_PromptStr);*/
+
+                    _KernelInterruptQueue.enqueue(new Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
+
                     break;
                 }
                 case "EC":

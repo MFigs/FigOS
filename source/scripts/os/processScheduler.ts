@@ -5,9 +5,11 @@ module TSOS {
         // Process Scheduling Algorithms:
         // 0: Round Robin
 
-        public scheduleAlgorithm: number = 0;
+        public scheduleAlgorithm: number;
 
         constructor() {
+
+            this.scheduleAlgorithm = 0;
 
         }
 
@@ -33,10 +35,18 @@ module TSOS {
 
             if (!_ReadyQueue.isEmpty()) {
 
+                _PCBArray[_CPU.currentPID].procStatus = "Ready";
                 _ReadyQueue.enqueue(_PCBArray[_CPU.currentPID]);
                 var currPCB: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
                 currPCB.quantumCycleCount = 0;
+                currPCB.procStatus = "Running";
                 _CPU.loadCPU(currPCB);
+
+            }
+
+            else {
+
+                _PCBArray[_CPU.currentPID].quantumCycleCount = 0;
 
             }
 
@@ -46,15 +56,19 @@ module TSOS {
 
             if (!_ReadyQueue.isEmpty()) {
 
+                _PCBArray[_CPU.currentPID].procStatus = "Terminated";
                 var currPCB: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
                 currPCB.quantumCycleCount = 0;
                 _CPU.loadCPU(currPCB);
 
             }
 
-            else
+            else {
+
+                _PCBArray[_CPU.currentPID].procStatus = "Terminated";
                 _CPU.isExecuting = false;
 
+            }
         }
 
     }

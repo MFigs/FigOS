@@ -29,6 +29,8 @@ var _PCBArray;
 
 var _Display;
 
+var _MemLoadedTable;
+
 var _OSclock = 0;
 
 var _Mode = 0;

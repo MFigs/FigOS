@@ -432,40 +432,70 @@ module TSOS {
 
         public shellLoad() {
 
-                var programTextElem = <HTMLInputElement> document.getElementById("taProgramInput");
-                var programStr: string = programTextElem.value.toString();
-                programStr = programStr.replace(/\s/g, "");
+            var programTextElem = <HTMLInputElement> document.getElementById("taProgramInput");
+            var programStr:string = programTextElem.value.toString();
+            programStr = programStr.replace(/\s/g, "");
 
-            if(programStr.length > 0) {
+            if ((_MemLoadedTable[0] === 1) && (_MemLoadedTable[1] === 1) && (_MemLoadedTable[2] === 1)) {
 
-                var isValidHex = true;
-                var textCount = 0;
-                if (programStr.length > 0) {
-                    while (isValidHex && (textCount < programStr.length)) {
-                        var chkChr = programStr.charCodeAt(textCount);
-                        if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
-                            textCount++;
+                _StdOut.putText("Memory is Full... Please Clear Memory and Load Program Again...");
+
+            }
+
+            else {
+
+                var prevMemBlock = _CurrentMemBlock;
+
+                if (_MemLoadedTable[0] === 0) {
+                    _CurrentMemBlock = 0;
+                    _MemLoadedTable[_CurrentMemBlock] = 1;
+                }
+                else if (_MemLoadedTable[1] === 0) {
+                    _CurrentMemBlock = 1;
+                    _MemLoadedTable[_CurrentMemBlock] = 1;
+                }
+                else if (_MemLoadedTable[2] === 0) {
+                    _CurrentMemBlock = 2;
+                    _MemLoadedTable[_CurrentMemBlock] = 1;
+                }
+
+                if(programStr.length > 0) {
+
+                    var isValidHex = true;
+                    var textCount = 0;
+                    if (programStr.length > 0) {
+                        while (isValidHex && (textCount < programStr.length)) {
+                            var chkChr = programStr.charCodeAt(textCount);
+                            if (((chkChr > 47) && (chkChr < 58)) || ((chkChr > 64) && (chkChr < 71)) || ((chkChr > 96) && (chkChr < 103)) || (chkChr === 32)) {
+                                textCount++;
+                            }
+                            else {
+                                isValidHex = false;
+                            }
+                        }
+                        if (isValidHex) {
+                            _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
+                            var pcb = new ProcessControlBlock();
+                            _PCBArray[pcb.PID] = pcb;
+                            _ResidentPCBList[pcb.PID] = _CurrentMemBlock + 1;
+                            _StdOut.putText("Loaded Program: PID " + pcb.PID);
+                            _Kernel.memManager.updateMem();
                         }
                         else {
-                            isValidHex = false;
+                            _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
+                            _MemLoadedTable[_CurrentMemBlock] = 0;
+                            _CurrentMemBlock = prevMemBlock;
                         }
                     }
-                    if (isValidHex) {
-                       _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
-                        var pcb = new ProcessControlBlock();
-                        _PCBArray[pcb.PID] = pcb;
-                        _ResidentPCBList[pcb.PID] = 1;
-                        _StdOut.putText("Loaded Program: PID " + pcb.PID);
-                        _Kernel.memManager.updateMem();
-                    }
                     else {
-                        _StdOut.putText("INVALID PROGRAM LOADED: PLEASE LOAD A VALID PROGRAM");
+                        _StdOut.putText("NO PROGRAM TO LOAD");
+                        _MemLoadedTable[_CurrentMemBlock] = 0;
+                        _CurrentMemBlock = prevMemBlock;
                     }
                 }
-                else {
-                    _StdOut.putText("NO PROGRAM TO LOAD");
-                }
+
             }
+
         }
 
         public shellBSOD() {
@@ -476,9 +506,10 @@ module TSOS {
 
             if ((_ResidentPCBList[pid] === 1) || (_ResidentPCBList[pid] === 2) || (_ResidentPCBList[pid] === 3)) {
                 //_StdOut.putText("pcb found");
-                _CPU.loadCPU(_PCBArray[pid]);
+                //_CPU.loadCPU(_PCBArray[pid]);
                 _PCBArray[pid].updateStatus("Ready");
                 _PCBArray[pid].updateLoc();
+                _ReadyQueue.enqueue(_PCBArray[pid]);
                 _ActiveProgramExists = true;
                 //_StdOut.putText("CPU loaded");
                 _CPU.isExecuting = true;

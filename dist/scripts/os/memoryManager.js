@@ -4,8 +4,7 @@ var TSOS;
         function MemoryManager() {
         }
         MemoryManager.prototype.loadMem = function (blockNumber, inputProgram) {
-            this.clearMem();
-
+            //this.clearMem();
             var memLoc = blockNumber * _MemBlockSize;
 
             var len = inputProgram.length;
@@ -17,21 +16,23 @@ var TSOS;
 
                 _MemoryArray.mem[memLoc] = loadValue;
                 memLoc++;
-                // Add Memory Bound Check Above Block
             }
         };
 
         MemoryManager.prototype.clearMem = function () {
             _MemoryArray.clearMem();
+            for (var i = 0; i < 3; i++)
+                _MemLoadedTable[i] = 0;
+            for (var j = 0; j < _ResidentPCBList.length; j++)
+                _ResidentPCBList[j] = 0;
         };
 
         MemoryManager.prototype.storeMem = function (relativeAddress, valueToStore) {
             if (relativeAddress >= 0 && relativeAddress <= 255) {
                 _MemoryArray.mem[relativeAddress + (_CurrentMemBlock * _MemBlockSize)] = valueToStore;
-                //_StdOut.putText(valueToStore);
-                //_StdOut.putText(_MemoryArray[relativeAddress + (_CurrentMemBlock * _MemBlockSize)]);
             } else {
-                // Kernel Error
+                _StdOut.putText("Error: Invalid Memory Store... Index Out of Bounds... Terminating Process...");
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
             }
         };
 
@@ -39,7 +40,8 @@ var TSOS;
             if (relativeAddress >= 0 && relativeAddress <= 255) {
                 return _MemoryArray.mem[relativeAddress + (_CurrentMemBlock * _MemBlockSize)];
             } else {
-                // Kernel Error
+                _StdOut.putText("Error: Invalid Memory Access... Index Out of Bounds... Terminating Process...");
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
             }
         };
 
@@ -47,7 +49,8 @@ var TSOS;
             if (address >= 0 && address <= 767) {
                 return _MemoryArray.mem[address];
             } else {
-                // Kernel Error
+                _StdOut.putText("Error: Invalid Memory Access... Index Out of Bounds... Terminating Process...");
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
             }
         };
 

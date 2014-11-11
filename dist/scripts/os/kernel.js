@@ -31,6 +31,10 @@ var TSOS;
 
             _Display = new TSOS.Display();
 
+            _MemLoadedTable = [];
+            for (var i = 0; i < 3; i++)
+                _MemLoadedTable[i] = 0;
+
             //TODO: Replace current multi-variable time format below, possible simplified implementation of date/time formatting that already exists
             setInterval(function () {
                 var cDate = new Date();
@@ -224,7 +228,7 @@ var TSOS;
         Kernel.prototype.updateState = function () {
             this.memManager.updateMem();
             _Display.updateCPU();
-            _Display.displayRQ();
+            _Display.updateRQ();
         };
         return Kernel;
     })();
