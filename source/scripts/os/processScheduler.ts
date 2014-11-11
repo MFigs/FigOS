@@ -35,12 +35,17 @@ module TSOS {
 
             if (!_ReadyQueue.isEmpty()) {
 
+                var oldPCB: TSOS.ProcessControlBlock = _PCBArray[_CPU.currentPID];
+
                 _PCBArray[_CPU.currentPID].procStatus = "Ready";
                 _ReadyQueue.enqueue(_PCBArray[_CPU.currentPID]);
                 var currPCB: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
+                _CurrentMemBlock =_ResidentPCBList[currPCB.PID] - 1;
                 currPCB.quantumCycleCount = 0;
                 currPCB.procStatus = "Running";
                 _CPU.loadCPU(currPCB);
+
+                console.log("CONTEXT SWITCH: Process " + oldPCB.PID + " added to ready queue; Process " + currPCB.PID + " loaded to CPU");
 
             }
 
@@ -56,10 +61,15 @@ module TSOS {
 
             if (!_ReadyQueue.isEmpty()) {
 
+                var oldPCB: TSOS.ProcessControlBlock = _PCBArray[_CPU.currentPID];
+
                 _PCBArray[_CPU.currentPID].procStatus = "Terminated";
                 var currPCB: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
+                _CurrentMemBlock =_ResidentPCBList[currPCB.PID] - 1;
                 currPCB.quantumCycleCount = 0;
                 _CPU.loadCPU(currPCB);
+
+                console.log("CONTEXT SWITCH: Process " + oldPCB.PID + " terminated; Process " + currPCB.PID + " loaded to CPU");
 
             }
 

@@ -13,6 +13,9 @@ var TSOS;
             this.quantumCycleCount = 0;
             this.procStatus = "N/A";
 
+            this.base = (_ResidentPCBList[this.PID] - 1) * _MemBlockSize;
+            this.limit = (_ResidentPCBList[this.PID] * _MemBlockSize) - 1;
+
             if ((_ResidentPCBList[this.PID] === 1) || (_ResidentPCBList[this.PID] === 2) || (_ResidentPCBList[this.PID] === 3))
                 this.loc = "Memory Block " + (_ResidentPCBList[this.PID] - 1);
             else

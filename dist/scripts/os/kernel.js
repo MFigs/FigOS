@@ -137,6 +137,7 @@ var TSOS;
                 _CPU.cycle();
             } else {
                 this.krnTrace("Idle");
+                this.updateState();
             }
         };
 

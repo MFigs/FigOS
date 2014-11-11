@@ -27,7 +27,8 @@ module TSOS {
                     public currentPID: number = 0,
                     public isExecuting: boolean = false,
                     public base: number = 0,
-                    public limit: number = 0) {
+                    public limit: number = 0,
+                    public hasProgram: boolean = false) {
 
         }
 
@@ -42,6 +43,7 @@ module TSOS {
             this.isExecuting = false;
             this.base = 0;
             this.limit = 0;
+            this.hasProgram = false;
         }
 
         public loadCPU(pcb: ProcessControlBlock) {
@@ -62,6 +64,13 @@ module TSOS {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+
+            if (this.hasProgram = false) {
+
+                _ReadyQueue.dequeue();
+                this.hasProgram = true;
+
+            }
 
             if (_SingleStepActive) {
 

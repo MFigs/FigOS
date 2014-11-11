@@ -19,12 +19,17 @@ var TSOS;
 
         ProcessScheduler.prototype.contextSwitch = function () {
             if (!_ReadyQueue.isEmpty()) {
+                var oldPCB = _PCBArray[_CPU.currentPID];
+
                 _PCBArray[_CPU.currentPID].procStatus = "Ready";
                 _ReadyQueue.enqueue(_PCBArray[_CPU.currentPID]);
                 var currPCB = _ReadyQueue.dequeue();
+                _CurrentMemBlock = _ResidentPCBList[currPCB.PID] - 1;
                 currPCB.quantumCycleCount = 0;
                 currPCB.procStatus = "Running";
                 _CPU.loadCPU(currPCB);
+
+                console.log("CONTEXT SWITCH: Process " + oldPCB.PID + " added to ready queue; Process " + currPCB.PID + " loaded to CPU");
             } else {
                 _PCBArray[_CPU.currentPID].quantumCycleCount = 0;
             }
@@ -32,10 +37,15 @@ var TSOS;
 
         ProcessScheduler.prototype.contextSwitchDrop = function () {
             if (!_ReadyQueue.isEmpty()) {
+                var oldPCB = _PCBArray[_CPU.currentPID];
+
                 _PCBArray[_CPU.currentPID].procStatus = "Terminated";
                 var currPCB = _ReadyQueue.dequeue();
+                _CurrentMemBlock = _ResidentPCBList[currPCB.PID] - 1;
                 currPCB.quantumCycleCount = 0;
                 _CPU.loadCPU(currPCB);
+
+                console.log("CONTEXT SWITCH: Process " + oldPCB.PID + " terminated; Process " + currPCB.PID + " loaded to CPU");
             } else {
                 _PCBArray[_CPU.currentPID].procStatus = "Terminated";
                 _CPU.isExecuting = false;

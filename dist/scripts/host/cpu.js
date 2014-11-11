@@ -13,7 +13,7 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 var TSOS;
 (function (TSOS) {
     var Cpu = (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, currentPID, isExecuting, base, limit) {
+        function Cpu(PC, Acc, Xreg, Yreg, Zflag, currentPID, isExecuting, base, limit, hasProgram) {
             if (typeof PC === "undefined") { PC = 0; }
             if (typeof Acc === "undefined") { Acc = 0; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
@@ -23,6 +23,7 @@ var TSOS;
             if (typeof isExecuting === "undefined") { isExecuting = false; }
             if (typeof base === "undefined") { base = 0; }
             if (typeof limit === "undefined") { limit = 0; }
+            if (typeof hasProgram === "undefined") { hasProgram = false; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -32,6 +33,7 @@ var TSOS;
             this.isExecuting = isExecuting;
             this.base = base;
             this.limit = limit;
+            this.hasProgram = hasProgram;
         }
         Cpu.prototype.init = function () {
             this.PC = 0;
@@ -44,6 +46,7 @@ var TSOS;
             this.isExecuting = false;
             this.base = 0;
             this.limit = 0;
+            this.hasProgram = false;
         };
 
         Cpu.prototype.loadCPU = function (pcb) {
@@ -62,6 +65,11 @@ var TSOS;
 
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            if (this.hasProgram = false) {
+                _ReadyQueue.dequeue();
+                this.hasProgram = true;
+            }
+
             if (_SingleStepActive) {
                 var nextProgramStep;
                 nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));

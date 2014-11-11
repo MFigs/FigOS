@@ -459,7 +459,7 @@ var TSOS;
         };
 
         Shell.prototype.shellClearMem = function () {
-            _MemoryArray.clearMem();
+            _Kernel.memManager.clearMem();
         };
 
         Shell.prototype.shellQuantum = function (q) {
@@ -509,11 +509,13 @@ var TSOS;
         Shell.prototype.shellPS = function () {
             if (_CPU.isExecuting || _ActiveProgramExists) {
                 _StdOut.putText("Current Process Running: " + _CPU.currentPID);
-                _StdOut.purText("Active Processes: ");
+                _StdOut.advanceLine();
+                _StdOut.putText("Active Processes: ");
+                _StdOut.advanceLine();
 
-                for (var i = 0; i < _ReadyQueue.getSize(); i++) {
+                for (var i = 0; i < _ReadyQueue.q.length; i++) {
                     var pcb = _ReadyQueue.q[i];
-                    _StdOut.putText(pcb.PID);
+                    _StdOut.putText(pcb.PID + " ");
                 }
             }
         };
