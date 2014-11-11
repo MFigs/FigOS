@@ -510,8 +510,17 @@ module TSOS {
                 _PCBArray[pid].updateStatus("Ready");
                 _PCBArray[pid].updateLoc();
                 _ReadyQueue.enqueue(_PCBArray[pid]);
+                _ProcessScheduler.programCount += 1;
                 _ActiveProgramExists = true;
                 //_StdOut.putText("CPU loaded");
+
+                if(!_CPU.isExecuting) {
+
+                    var pcb: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
+                    _CurrentMemBlock = _ResidentPCBList[pcb.PID] - 1;
+                    _CPU.loadCPU(pcb);
+
+                }
                 _CPU.isExecuting = true;
             }
 
@@ -543,11 +552,12 @@ module TSOS {
                 _StdOut.putText("Invalid Process ID specified in kill command...");
             }
             else {
-                for (var k: number = 0; k < _ReadyQueue.getSize(); k++) {
+                for (var k: number = 0; k < _ReadyQueue.q.length; k++) {
                     var pcb: TSOS.ProcessControlBlock = _ReadyQueue.q[k];
                     if (pcb.PID === pid) {
                         _PCBArray[pid].procStatus = "Terminated";
                         _ReadyQueue.q.splice(k, 1);
+                        _ProcessScheduler.programCount -= 1;
                     }
                 }
             }
@@ -564,6 +574,7 @@ module TSOS {
             }
 
             _ReadyQueue.clearQueue();
+            _ProcessScheduler.programCount = 0;
 
         }
 
@@ -571,12 +582,26 @@ module TSOS {
 
             //TODO: Make this more abstract to support multiple load/run cycles
 
+            var minActivePID: number = 999;
+
             for (var j: number = 0; j < _ResidentPCBList.length; j++) {
                 if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3)) {
                     _PCBArray[j].updateStatus("Ready");
                     _PCBArray[j].updateLoc();
                     _ReadyQueue.enqueue(_PCBArray[j]);
+                    _ProcessScheduler.programCount += 1;
+
+                    if (j < minActivePID)
+                        minActivePID = j;
                 }
+            }
+
+            if(!_CPU.isExecuting) {
+
+                var pcb: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
+                _CurrentMemBlock = _ResidentPCBList[j] - 1;
+                _CPU.loadCPU(pcb);
+
             }
 
             _CPU.isExecuting = true;

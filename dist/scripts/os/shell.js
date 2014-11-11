@@ -449,9 +449,15 @@ var TSOS;
                 _PCBArray[pid].updateStatus("Ready");
                 _PCBArray[pid].updateLoc();
                 _ReadyQueue.enqueue(_PCBArray[pid]);
+                _ProcessScheduler.programCount += 1;
                 _ActiveProgramExists = true;
 
                 //_StdOut.putText("CPU loaded");
+                if (!_CPU.isExecuting) {
+                    var pcb = _ReadyQueue.dequeue();
+                    _CurrentMemBlock = _ResidentPCBList[pcb.PID] - 1;
+                    _CPU.loadCPU(pcb);
+                }
                 _CPU.isExecuting = true;
             } else {
                 _StdOut.putText("Program referenced is not loaded, please load the program or reference a valid PID");
@@ -473,11 +479,12 @@ var TSOS;
             } else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3)) {
                 _StdOut.putText("Invalid Process ID specified in kill command...");
             } else {
-                for (var k = 0; k < _ReadyQueue.getSize(); k++) {
+                for (var k = 0; k < _ReadyQueue.q.length; k++) {
                     var pcb = _ReadyQueue.q[k];
                     if (pcb.PID === pid) {
                         _PCBArray[pid].procStatus = "Terminated";
                         _ReadyQueue.q.splice(k, 1);
+                        _ProcessScheduler.programCount -= 1;
                     }
                 }
             }
@@ -492,15 +499,29 @@ var TSOS;
             }
 
             _ReadyQueue.clearQueue();
+            _ProcessScheduler.programCount = 0;
         };
 
         Shell.prototype.shellRunAll = function () {
+            //TODO: Make this more abstract to support multiple load/run cycles
+            var minActivePID = 999;
+
             for (var j = 0; j < _ResidentPCBList.length; j++) {
                 if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3)) {
                     _PCBArray[j].updateStatus("Ready");
                     _PCBArray[j].updateLoc();
                     _ReadyQueue.enqueue(_PCBArray[j]);
+                    _ProcessScheduler.programCount += 1;
+
+                    if (j < minActivePID)
+                        minActivePID = j;
                 }
+            }
+
+            if (!_CPU.isExecuting) {
+                var pcb = _ReadyQueue.dequeue();
+                _CurrentMemBlock = _ResidentPCBList[j] - 1;
+                _CPU.loadCPU(pcb);
             }
 
             _CPU.isExecuting = true;

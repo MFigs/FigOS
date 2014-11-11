@@ -6,10 +6,12 @@ module TSOS {
         // 0: Round Robin
 
         public scheduleAlgorithm: number;
+        public programCount: number;
 
         constructor() {
 
             this.scheduleAlgorithm = 0;
+            this.programCount = 0;
 
         }
 
@@ -64,6 +66,7 @@ module TSOS {
                 var oldPCB: TSOS.ProcessControlBlock = _PCBArray[_CPU.currentPID];
 
                 _PCBArray[_CPU.currentPID].procStatus = "Terminated";
+                _ProcessScheduler.programCount -= 1;
                 var currPCB: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
                 _CurrentMemBlock =_ResidentPCBList[currPCB.PID] - 1;
                 currPCB.quantumCycleCount = 0;

@@ -13,7 +13,7 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 var TSOS;
 (function (TSOS) {
     var Cpu = (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, currentPID, isExecuting, base, limit, hasProgram) {
+        function Cpu(PC, Acc, Xreg, Yreg, Zflag, currentPID, isExecuting, base, limit) {
             if (typeof PC === "undefined") { PC = 0; }
             if (typeof Acc === "undefined") { Acc = 0; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
@@ -23,7 +23,6 @@ var TSOS;
             if (typeof isExecuting === "undefined") { isExecuting = false; }
             if (typeof base === "undefined") { base = 0; }
             if (typeof limit === "undefined") { limit = 0; }
-            if (typeof hasProgram === "undefined") { hasProgram = false; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -33,10 +32,9 @@ var TSOS;
             this.isExecuting = isExecuting;
             this.base = base;
             this.limit = limit;
-            this.hasProgram = hasProgram;
         }
         Cpu.prototype.init = function () {
-            this.PC = 0;
+            this.PC = -1;
             this.Acc = 0;
             this.Xreg = 0;
             this.Yreg = 0;
@@ -46,7 +44,6 @@ var TSOS;
             this.isExecuting = false;
             this.base = 0;
             this.limit = 0;
-            this.hasProgram = false;
         };
 
         Cpu.prototype.loadCPU = function (pcb) {
@@ -65,31 +62,28 @@ var TSOS;
 
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            if (this.hasProgram = false) {
-                _ReadyQueue.dequeue();
-                this.hasProgram = true;
-            }
+            if (this.PC >= 0) {
+                if (_SingleStepActive) {
+                    var nextProgramStep;
+                    nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
 
-            if (_SingleStepActive) {
-                var nextProgramStep;
-                nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
+                    _PrevPC = _CPU.PC;
 
-                _PrevPC = _CPU.PC;
+                    if (_NextClicked) {
+                        nextProgramStep.executeCommand();
+                    }
 
-                if (_NextClicked) {
+                    this.isExecuting = false;
+                } else {
+                    var nextProgramStep;
+                    nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
                     nextProgramStep.executeCommand();
                 }
 
-                this.isExecuting = false;
-            } else {
-                var nextProgramStep;
-                nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
-                nextProgramStep.executeCommand();
+                _Kernel.updateState();
+
+                _ProcessScheduler.handleScheduling();
             }
-
-            _Kernel.updateState();
-
-            _ProcessScheduler.handleScheduling();
         };
         return Cpu;
     })();

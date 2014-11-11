@@ -3,6 +3,7 @@ var TSOS;
     var ProcessScheduler = (function () {
         function ProcessScheduler() {
             this.scheduleAlgorithm = 0;
+            this.programCount = 0;
         }
         ProcessScheduler.prototype.handleScheduling = function () {
             if (_ProcessScheduler.scheduleAlgorithm === 0) {
@@ -40,6 +41,7 @@ var TSOS;
                 var oldPCB = _PCBArray[_CPU.currentPID];
 
                 _PCBArray[_CPU.currentPID].procStatus = "Terminated";
+                _ProcessScheduler.programCount -= 1;
                 var currPCB = _ReadyQueue.dequeue();
                 _CurrentMemBlock = _ResidentPCBList[currPCB.PID] - 1;
                 currPCB.quantumCycleCount = 0;

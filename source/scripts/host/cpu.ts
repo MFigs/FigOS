@@ -27,13 +27,12 @@ module TSOS {
                     public currentPID: number = 0,
                     public isExecuting: boolean = false,
                     public base: number = 0,
-                    public limit: number = 0,
-                    public hasProgram: boolean = false) {
+                    public limit: number = 0) {
 
         }
 
         public init(): void {
-            this.PC = 0;
+            this.PC = -1;
             this.Acc = 0;
             this.Xreg = 0;
             this.Yreg = 0;
@@ -43,7 +42,6 @@ module TSOS {
             this.isExecuting = false;
             this.base = 0;
             this.limit = 0;
-            this.hasProgram = false;
         }
 
         public loadCPU(pcb: ProcessControlBlock) {
@@ -65,39 +63,36 @@ module TSOS {
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
 
-            if (this.hasProgram = false) {
+            if (this.PC >= 0) {
 
-                _ReadyQueue.dequeue();
-                this.hasProgram = true;
+                if (_SingleStepActive) {
 
-            }
+                    var nextProgramStep:TSOS.ProgramCommand;
+                    nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
 
-            if (_SingleStepActive) {
+                    _PrevPC = _CPU.PC;
 
-                var nextProgramStep: TSOS.ProgramCommand;
-                nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
+                    if (_NextClicked) {
+                        nextProgramStep.executeCommand();
+                    }
 
-                _PrevPC = _CPU.PC;
+                    this.isExecuting = false;
 
-                if (_NextClicked) {
-                    nextProgramStep.executeCommand();
                 }
 
-                this.isExecuting = false;
+                else {
+
+                    var nextProgramStep:TSOS.ProgramCommand;
+                    nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
+                    nextProgramStep.executeCommand();
+
+                }
+
+                _Kernel.updateState();
+
+                _ProcessScheduler.handleScheduling();
 
             }
-
-            else {
-
-                var nextProgramStep: TSOS.ProgramCommand;
-                nextProgramStep = new TSOS.ProgramCommand(_Kernel.memManager.accessMem(_CPU.PC));
-                nextProgramStep.executeCommand();
-
-            }
-
-            _Kernel.updateState();
-
-            _ProcessScheduler.handleScheduling();
 
         }
 
