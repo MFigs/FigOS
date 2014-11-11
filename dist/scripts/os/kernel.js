@@ -23,8 +23,13 @@ var TSOS;
             _KernelInputQueue = new TSOS.Queue(); // Where device input lands before being processed out somewhere.
             _Console = new TSOS.Console(); // The command line interface / console I/O device.
 
+            // Initiate Ready Queue
+            _ReadyQueue = new TSOS.Queue();
+
             // Initialize the console.
             _Console.init();
+
+            _Display = new TSOS.Display();
 
             //TODO: Replace current multi-variable time format below, possible simplified implementation of date/time formatting that already exists
             setInterval(function () {
@@ -63,10 +68,6 @@ var TSOS;
             _StdIn = _Console;
             _StdOut = _Console;
 
-            _Display = new TSOS.Display();
-
-            _Display.displayCPU();
-
             this.updateState();
 
             // Load the Keyboard Device Driver
@@ -92,9 +93,6 @@ var TSOS;
 
             // Initiate Resident PCB List
             _PCBArray = [];
-
-            // Initiate Ready Queue
-            _ReadyQueue = new TSOS.Queue();
 
             // Initialize the Process Scheduler
             _ProcessScheduler = new TSOS.ProcessScheduler;
@@ -226,6 +224,7 @@ var TSOS;
         Kernel.prototype.updateState = function () {
             this.memManager.updateMem();
             _Display.updateCPU();
+            _Display.displayRQ();
         };
         return Kernel;
     })();

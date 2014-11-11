@@ -477,6 +477,8 @@ module TSOS {
             if ((_ResidentPCBList[pid] === 1) || (_ResidentPCBList[pid] === 2) || (_ResidentPCBList[pid] === 3)) {
                 //_StdOut.putText("pcb found");
                 _CPU.loadCPU(_PCBArray[pid]);
+                _PCBArray[pid].updateStatus("Ready");
+                _PCBArray[pid].updateLoc();
                 _ActiveProgramExists = true;
                 //_StdOut.putText("CPU loaded");
                 _CPU.isExecuting = true;
@@ -504,6 +506,7 @@ module TSOS {
 
             if (_CPU.currentPID === pid) {
                _KernelInterruptQueue.enqueue(new Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
+               _PCBArray[pid].procStatus = "Terminated";
             }
             else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3)) {
                 _StdOut.putText("Invalid Process ID specified in kill command...");
@@ -512,6 +515,7 @@ module TSOS {
                 for (var k: number = 0; k < _ReadyQueue.getSize(); k++) {
                     var pcb: TSOS.ProcessControlBlock = _ReadyQueue.q[k];
                     if (pcb.PID === pid) {
+                        _PCBArray[pid].procStatus = "Terminated";
                         _ReadyQueue.q.splice(k, 1);
                     }
                 }
@@ -522,6 +526,12 @@ module TSOS {
         public shellKillAll() {
 
             _CPU.isExecuting = false;
+
+            for (var i = 0; i < _PCBArray.length; i++) {
+                if ((_PCBArray[i].procStatus === "Ready") || (_PCBArray[i].procStatus === "Running"))
+                    _PCBArray[i].procStatus = "Terminated";
+            }
+
             _ReadyQueue.clearQueue();
 
         }
@@ -532,6 +542,8 @@ module TSOS {
 
             for (var j: number = 0; j < _ResidentPCBList.length; j++) {
                 if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3)) {
+                    _PCBArray[j].updateStatus("Ready");
+                    _PCBArray[j].updateLoc();
                     _ReadyQueue.enqueue(_PCBArray[j]);
                 }
             }

@@ -27,8 +27,13 @@ module TSOS {
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
             _Console = new Console();          // The command line interface / console I/O device.
 
+            // Initiate Ready Queue
+            _ReadyQueue = new TSOS.Queue();
+
             // Initialize the console.
             _Console.init();
+
+            _Display = new TSOS.Display();
 
             //TODO: Replace current multi-variable time format below, possible simplified implementation of date/time formatting that already exists
 
@@ -70,9 +75,6 @@ module TSOS {
             _StdIn  = _Console;
             _StdOut = _Console;
 
-            _Display = new TSOS.Display();
-
-            _Display.displayCPU();
 
             this.updateState();
 
@@ -100,9 +102,6 @@ module TSOS {
 
             // Initiate Resident PCB List
             _PCBArray = [];
-
-            // Initiate Ready Queue
-            _ReadyQueue = new TSOS.Queue();
 
             // Initialize the Process Scheduler
             _ProcessScheduler = new TSOS.ProcessScheduler;
@@ -247,6 +246,7 @@ module TSOS {
         public updateState() {
             this.memManager.updateMem();
             _Display.updateCPU();
+            _Display.displayRQ();
         }
 
     }
