@@ -101,7 +101,7 @@ var TSOS;
             }
 
             if (noSuchFileExists) {
-                _StdOut.putText("Error: No Such File Exists on Disk");
+                _StdOut.putText("Error: No Such File Exists on Disk... No Files Deleted");
             } else if (fileFound) {
                 var hddBlock = sessionStorage.getItem(loc);
                 var blockData = hddBlock.substr(4);
