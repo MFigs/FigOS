@@ -101,3 +101,5 @@ var _ProcessScheduler: TSOS.ProcessScheduler;
 var _TerminatedProcessList: number[];
 
 var _Quantum: number = 6;
+
+var _HDD: TSOS.HardDrive;

@@ -109,6 +109,34 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellPS, "ps", "- Displays all currently active processes.");
             this.commandList[this.commandList.length] = sc;
 
+            //create <string>
+            sc = new TSOS.ShellCommand(this.shellCreate, "create", "<string> - Allows user to create a file with the name specified by the string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //read <string>
+            sc = new TSOS.ShellCommand(this.shellRead, "read", "<string> - Allows user to read a file with the name specified by the string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //delete <string>
+            sc = new TSOS.ShellCommand(this.shellDelete, "delete", "<string> - Allows user to delete a file with the name specified by the string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //write <string> <string>
+            sc = new TSOS.ShellCommand(this.shellWrite, "write", "<string> <string> - Allows user to write data to a file with the name specified by the first string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //format
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", "- Formats all tracks, sectors and blocks of the harddrive.");
+            this.commandList[this.commandList.length] = sc;
+
+            //setschedule <string>
+            sc = new TSOS.ShellCommand(this.shellSetSched, "setschedule", "<string> - Allows users to specify the process scheduling algorithm to be used by the operating system.");
+            this.commandList[this.commandList.length] = sc;
+
+            //getschedule
+            sc = new TSOS.ShellCommand(this.shellReturnSched, "getschedule", "- Returns the current process scheduling algorithm being used by the operating system.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -538,6 +566,46 @@ var TSOS;
                     _StdOut.putText(pcb.PID + " ");
                 }
             }
+        };
+
+        Shell.prototype.shellCreate = function (filename) {
+            _HDD.createFile(filename);
+        };
+
+        Shell.prototype.shellRead = function (filename) {
+            _HDD.readFile(filename);
+        };
+
+        Shell.prototype.shellWrite = function (filename, data) {
+            _HDD.writeFile(filename, data);
+        };
+
+        Shell.prototype.shellDelete = function (filename) {
+            _HDD.deleteFile(filename);
+        };
+
+        Shell.prototype.shellFormat = function () {
+            _HDD.formatHDD();
+        };
+
+        Shell.prototype.shellSetSched = function (scheduleAlgorithm) {
+            if (scheduleAlgorithm == "rr")
+                _ProcessScheduler.scheduleAlgorithm = 0;
+            else if (scheduleAlgorithm == "fcfs")
+                _ProcessScheduler.scheduleAlgorithm = 1;
+            else if (scheduleAlgorithm == "priority")
+                _ProcessScheduler.scheduleAlgorithm = 2;
+            else
+                _StdOut.putText("Error: Invalid Scheduling Algorithm Specified... select \"rr\", \"fcfs\", or \"priority\"...");
+        };
+
+        Shell.prototype.shellReturnSched = function () {
+            if (_ProcessScheduler.scheduleAlgorithm === 0)
+                _StdOut.putText("Current Schedule Algorithm: Round Robin");
+            else if (_ProcessScheduler.scheduleAlgorithm === 1)
+                _StdOut.putText("Current Schedule Algorithm: First-Come First-Served");
+            else if (_ProcessScheduler.scheduleAlgorithm === 2)
+                _StdOut.putText("Current Schedule Algorithm: Priority");
         };
         return Shell;
     })();

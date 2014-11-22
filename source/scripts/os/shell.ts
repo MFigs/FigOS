@@ -157,6 +157,48 @@ module TSOS {
                 "- Displays all currently active processes.");
             this.commandList[this.commandList.length] = sc;
 
+            //create <string>
+            sc = new ShellCommand(this.shellCreate,
+                "create",
+                "<string> - Allows user to create a file with the name specified by the string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //read <string>
+            sc = new ShellCommand(this.shellRead,
+                "read",
+                "<string> - Allows user to read a file with the name specified by the string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //delete <string>
+            sc = new ShellCommand(this.shellDelete,
+                "delete",
+                "<string> - Allows user to delete a file with the name specified by the string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //write <string> <string>
+            sc = new ShellCommand(this.shellWrite,
+                "write",
+                "<string> <string> - Allows user to write data to a file with the name specified by the first string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //format
+            sc = new ShellCommand(this.shellFormat,
+                "format",
+                "- Formats all tracks, sectors and blocks of the harddrive.");
+            this.commandList[this.commandList.length] = sc;
+
+            //setschedule <string>
+            sc = new ShellCommand(this.shellSetSched,
+                "setschedule",
+                "<string> - Allows users to specify the process scheduling algorithm to be used by the operating system.");
+            this.commandList[this.commandList.length] = sc;
+
+            //getschedule
+            sc = new ShellCommand(this.shellReturnSched,
+                "getschedule",
+                "- Returns the current process scheduling algorithm being used by the operating system.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -623,6 +665,60 @@ module TSOS {
 
                 }
             }
+
+        }
+
+        public shellCreate(filename: string) {
+
+            _HDD.createFile(filename);
+
+        }
+
+        public shellRead(filename: string) {
+
+            _HDD.readFile(filename);
+
+        }
+
+        public shellWrite(filename: string, data: string) {
+
+            _HDD.writeFile(filename, data);
+
+        }
+
+        public shellDelete(filename: string) {
+
+            _HDD.deleteFile(filename);
+
+        }
+
+        public shellFormat() {
+
+            _HDD.formatHDD();
+
+        }
+
+        public shellSetSched(scheduleAlgorithm: string) {
+
+            if (scheduleAlgorithm == "rr")
+                _ProcessScheduler.scheduleAlgorithm = 0;
+            else if (scheduleAlgorithm == "fcfs")
+                _ProcessScheduler.scheduleAlgorithm = 1;
+            else if (scheduleAlgorithm == "priority")
+                _ProcessScheduler.scheduleAlgorithm = 2;
+            else
+                _StdOut.putText("Error: Invalid Scheduling Algorithm Specified... select \"rr\", \"fcfs\", or \"priority\"...");
+
+        }
+
+        public shellReturnSched() {
+
+            if (_ProcessScheduler.scheduleAlgorithm === 0)
+                _StdOut.putText("Current Schedule Algorithm: Round Robin");
+            else if (_ProcessScheduler.scheduleAlgorithm === 1)
+                _StdOut.putText("Current Schedule Algorithm: First-Come First-Served");
+            else if (_ProcessScheduler.scheduleAlgorithm === 2)
+                _StdOut.putText("Current Schedule Algorithm: Priority");
 
         }
 

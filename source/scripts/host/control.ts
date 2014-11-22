@@ -50,6 +50,9 @@ module TSOS {
 
             _MemoryArray.displayMemory();
 
+            // Create Hard Drive
+            _HDD = new HardDrive();
+
             // Check for our testing and enrichment core.
             if (typeof Glados === "function") {
                 _GLaDOS = new Glados();
