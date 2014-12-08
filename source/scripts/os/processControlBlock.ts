@@ -15,6 +15,7 @@ module TSOS {
         public quantumCycleCount: number;
         public procStatus: string;
         public loc: string;
+        public priority: number;
 
         public base: number;
         public limit: number;
@@ -31,6 +32,7 @@ module TSOS {
             this.zFlag = 0;
             this.quantumCycleCount = 0;
             this.procStatus = "N/A";
+            this.priority = 0;
 
             this.base = (_ResidentPCBList[this.PID] - 1) * _MemBlockSize;
             this.limit = (_ResidentPCBList[this.PID] * _MemBlockSize) - 1;

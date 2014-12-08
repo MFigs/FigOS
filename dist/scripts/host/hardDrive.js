@@ -6,28 +6,28 @@ var TSOS;
                 for (var s = 0; s < 8; s++) {
                     for (var b = 0; b < 8; b++) {
                         if (t === 0)
-                            sessionStorage.setItem("" + t + s + b, '0&&&************************************************************');
+                            sessionStorage.setItem("" + t + s + b, '0&&&************************************************************************************************************************');
                         else
-                            sessionStorage.setItem("" + t + s + b, '0&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                            sessionStorage.setItem("" + t + s + b, '0&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
                     }
                 }
             }
 
-            sessionStorage.setItem("000", '1&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+            sessionStorage.setItem("000", '1&&&************************************************************************************************************************');
         }
         HardDrive.prototype.formatHDD = function () {
             for (var t = 0; t < 4; t++) {
                 for (var s = 0; s < 8; s++) {
                     for (var b = 0; b < 8; b++) {
                         if (t === 0)
-                            sessionStorage.setItem("" + t + s + b, '0&&&************************************************************');
+                            sessionStorage.setItem("" + t + s + b, '0&&&************************************************************************************************************************');
                         else
-                            sessionStorage.setItem("" + t + s + b, '0&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                            sessionStorage.setItem("" + t + s + b, '0&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
                     }
                 }
             }
 
-            sessionStorage.setItem("000", '1&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+            sessionStorage.setItem("000", '1&&&************************************************************************************************************************');
         };
 
         HardDrive.prototype.readFile = function (fileName) {
@@ -49,11 +49,11 @@ var TSOS;
                         }
                     }
 
-                    if (loc !== "")
+                    if (location !== "")
                         break;
                 }
 
-                if (loc !== "")
+                if (location !== "")
                     break;
             }
 
@@ -66,7 +66,7 @@ var TSOS;
 
             var blockDataFinal = sessionStorage.getItem(location);
             blockDataFinal = blockDataFinal.substr(4);
-            blockDataFinal = blockDataFinal.replace('*', '');
+            blockDataFinal = blockDataFinal.replace('~', '');
             data += blockDataFinal;
 
             _StdOut.putText(this.convertHexToString(data));
@@ -142,7 +142,7 @@ var TSOS;
                                 storeString = storeString + this.charToHex(ch);
                                 fileName = fileName.slice(1);
                             } else {
-                                storeString = storeString + '*';
+                                storeString = storeString + '**';
                             }
                         }
 
@@ -165,6 +165,56 @@ var TSOS;
         };
 
         HardDrive.prototype.writeFile = function (fileName, dataString) {
+            var writeSuccess = false;
+            var writeFailure = false;
+            var fileNameFound = false;
+            var t = "0";
+
+            for (var s = 0; s < 8; s++) {
+                for (var b = 0; b < 8; b++) {
+                    var hddBlock = sessionStorage.getItem(t + s + b);
+
+                    if ((s === 7) && (b === 7) && !fileNameFound) {
+                        writeFailure = true;
+                        break;
+                    }
+
+                    var tempFileName = this.convertHexToString(hddBlock.substr(4, 120)).replace('*', '');
+                    if (fileName === tempFileName) {
+                        var tempLoc = this.findNextEmptyBlock();
+                        if (tempLoc !== '999') {
+                            sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4, 120));
+                        }
+                    }
+                    if (hddBlock.charAt(0) === '0') {
+                        var storeString = "1&&&";
+
+                        for (var i = 4; i < 64; i++) {
+                            if (fileName.length != 0) {
+                                var ch = fileName.charAt(0);
+                                storeString = storeString + this.charToHex(ch);
+                                fileName = fileName.slice(1);
+                            } else {
+                                storeString = storeString + '**';
+                            }
+                        }
+
+                        sessionStorage.setItem(t + s + b, storeString);
+                        writeSuccess = true;
+                    }
+
+                    if (writeSuccess || writeFailure)
+                        break;
+                }
+
+                if (writeSuccess || writeFailure)
+                    break;
+            }
+
+            if (writeSuccess)
+                _StdOut.putText("File Created");
+            else if (writeFailure)
+                _StdOut.putText("Error: Memory Full... File Not Created");
         };
 
         HardDrive.prototype.convertStringToHex = function (data) {
@@ -765,6 +815,20 @@ var TSOS;
                     return '~';
                 }
             }
+        };
+
+        HardDrive.prototype.findNextEmptyBlock = function () {
+            for (var t = 1; t < 4; t++) {
+                for (var s = 0; s < 8; s++) {
+                    for (var b = 0; b < 8; b++) {
+                        var hddBlock = sessionStorage.getItem(t + s + b);
+                        if (hddBlock.charAt[0] === 0)
+                            return "" + t + s + b;
+                    }
+                }
+            }
+
+            return "999";
         };
         return HardDrive;
     })();

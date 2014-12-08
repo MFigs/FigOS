@@ -12,6 +12,7 @@ var TSOS;
             this.zFlag = 0;
             this.quantumCycleCount = 0;
             this.procStatus = "N/A";
+            this.priority = 0;
 
             this.base = (_ResidentPCBList[this.PID] - 1) * _MemBlockSize;
             this.limit = (_ResidentPCBList[this.PID] * _MemBlockSize) - 1;

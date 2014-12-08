@@ -472,7 +472,7 @@ module TSOS {
 
         // TODO: Fix load function to stop "enter" key from causing program to think hex code is invalid
 
-        public shellLoad() {
+        public shellLoad(param: number) {
 
             var programTextElem = <HTMLInputElement> document.getElementById("taProgramInput");
             var programStr:string = programTextElem.value.toString();
@@ -518,6 +518,10 @@ module TSOS {
                         if (isValidHex) {
                             _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
                             var pcb = new ProcessControlBlock();
+
+                            if(arguments.length === 1)
+                                pcb.priority = param;
+
                             _PCBArray[pcb.PID] = pcb;
                             _ResidentPCBList[pcb.PID] = _CurrentMemBlock + 1;
                             _TerminatedProcessList[pcb.PID] = 0;
@@ -582,7 +586,10 @@ module TSOS {
 
         public shellQuantum(q: number) {
 
-            _Quantum = q;
+            if (_ProcessScheduler.scheduleAlgorithm == 0)
+                _Quantum = q;
+            else
+                _StdOut.putText("Error: Round Robin Scheduler Not Currently Active... Can't Alter Quantum At This Time");
 
         }
 
@@ -700,12 +707,49 @@ module TSOS {
 
         public shellSetSched(scheduleAlgorithm: string) {
 
-            if (scheduleAlgorithm == "rr")
+            if (scheduleAlgorithm == "rr") {
+                if((_ProcessScheduler.scheduleAlgorithm) !== 0 || (_ProcessScheduler.scheduleAlgorithm !== 1)) {
+                    if (_ReadyQueue.isEmpty())
+                        _ReadyQueue = new TSOS.Queue();
+                    else {
+                        var temp = new TSOS.Queue();
+                        while (!_ReadyQueue.isEmpty()) {
+                            temp.enqueue(_ReadyQueue.dequeue());
+                        }
+                        _ReadyQueue = temp;
+                    }
+                }
                 _ProcessScheduler.scheduleAlgorithm = 0;
-            else if (scheduleAlgorithm == "fcfs")
+            }
+            else if (scheduleAlgorithm == "fcfs") {
+                if((_ProcessScheduler.scheduleAlgorithm) !== 0 || (_ProcessScheduler.scheduleAlgorithm !== 1)) {
+                    if (_ReadyQueue.isEmpty())
+                        _ReadyQueue = new TSOS.Queue();
+                    else {
+                        var temp = new TSOS.Queue();
+                        while (!_ReadyQueue.isEmpty()) {
+                            temp.enqueue(_ReadyQueue.dequeue());
+                        }
+                        _ReadyQueue = temp;
+                    }
+                }
+                _Quantum = Infinity;
                 _ProcessScheduler.scheduleAlgorithm = 1;
-            else if (scheduleAlgorithm == "priority")
+            }
+            else if (scheduleAlgorithm == "priority") {
+                if((_ProcessScheduler.scheduleAlgorithm) === 0 || (_ProcessScheduler.scheduleAlgorithm === 1)) {
+                    if (_ReadyQueue.isEmpty())
+                        _ReadyQueue = new TSOS.LazyPriorityQueue();
+                    else {
+                        var temp1 = new TSOS.LazyPriorityQueue();
+                        while (!_ReadyQueue.isEmpty()) {
+                            temp1.enqueue(_ReadyQueue.dequeue());
+                        }
+                        _ReadyQueue = temp1;
+                    }
+                }
                 _ProcessScheduler.scheduleAlgorithm = 2;
+            }
             else
                 _StdOut.putText("Error: Invalid Scheduling Algorithm Specified... select \"rr\", \"fcfs\", or \"priority\"...");
 

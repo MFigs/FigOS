@@ -11,9 +11,9 @@ module TSOS {
                     for(var b = 0; b < 8; b++) {
 
                         if (t === 0)
-                            sessionStorage.setItem("" + t + s + b, '0&&&************************************************************');
+                            sessionStorage.setItem("" + t + s + b, '0&&&************************************************************************************************************************');
                         else
-                            sessionStorage.setItem("" + t + s + b, '0&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                            sessionStorage.setItem("" + t + s + b, '0&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
 
                     }
 
@@ -21,7 +21,7 @@ module TSOS {
 
             }
 
-            sessionStorage.setItem("000", '1&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+            sessionStorage.setItem("000", '1&&&************************************************************************************************************************');
 
         }
 
@@ -34,9 +34,9 @@ module TSOS {
                     for(var b = 0; b < 8; b++) {
 
                         if (t === 0)
-                            sessionStorage.setItem("" + t + s + b, '0&&&************************************************************');
+                            sessionStorage.setItem("" + t + s + b, '0&&&************************************************************************************************************************');
                         else
-                            sessionStorage.setItem("" + t + s + b, '0&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+                            sessionStorage.setItem("" + t + s + b, '0&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
 
                     }
 
@@ -44,7 +44,7 @@ module TSOS {
 
             }
 
-            sessionStorage.setItem("000", '1&&&~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+            sessionStorage.setItem("000", '1&&&************************************************************************************************************************');
 
         }
 
@@ -74,12 +74,12 @@ module TSOS {
 
                     }
 
-                    if (loc !== "")
+                    if (location !== "")
                         break;
 
                 }
 
-                if (loc !== "")
+                if (location !== "")
                     break;
 
             }
@@ -95,7 +95,7 @@ module TSOS {
 
             var blockDataFinal:string = sessionStorage.getItem(location);
             blockDataFinal = blockDataFinal.substr(4);
-            blockDataFinal = blockDataFinal.replace('*', '');
+            blockDataFinal = blockDataFinal.replace('~', '');
             data += blockDataFinal;
 
             _StdOut.putText(this.convertHexToString(data));
@@ -203,7 +203,7 @@ module TSOS {
                             }
                             else {
 
-                                storeString = storeString + '*';
+                                storeString = storeString + '**';
 
                             }
 
@@ -235,7 +235,79 @@ module TSOS {
 
         public writeFile(fileName: string, dataString: string) {
 
+            var writeSuccess:boolean = false;
+            var writeFailure:boolean = false;
+            var fileNameFound:boolean = false;
+            var t:string = "0";
 
+
+            for (var s = 0; s < 8; s++) {
+
+                for (var b = 0; b < 8; b++) {
+
+                    var hddBlock:string = sessionStorage.getItem(t + s + b);
+
+                    if ((s === 7) && (b === 7) && !fileNameFound) {
+
+                        writeFailure = true;
+                        break;
+
+                    }
+
+                    var tempFileName: string = this.convertHexToString(hddBlock.substr(4, 120)).replace('*', '');
+                    if (fileName === tempFileName) {
+
+                        var tempLoc: string = this.findNextEmptyBlock();
+                        if (tempLoc !== '999') {
+
+                            sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4, 120));
+
+
+                        }
+
+                    }
+                    if (hddBlock.charAt(0) === '0') {
+
+                        var storeString:string = "1&&&";
+
+                        for (var i = 4; i < 64; i++) {
+
+                            if (fileName.length != 0) {
+
+                                var ch:string = fileName.charAt(0);
+                                storeString = storeString + this.charToHex(ch);
+                                fileName = fileName.slice(1);
+
+                            }
+                            else {
+
+                                storeString = storeString + '**';
+
+                            }
+
+                        }
+
+                        sessionStorage.setItem(t + s + b, storeString);
+                        writeSuccess = true;
+
+                    }
+
+                    if (writeSuccess || writeFailure)
+                        break;
+
+                }
+
+                if (writeSuccess || writeFailure)
+                    break;
+
+            }
+
+
+            if (writeSuccess)
+                _StdOut.putText("File Created");
+
+            else if (writeFailure)
+                _StdOut.putText("Error: Memory Full... File Not Created");
 
         }
 
@@ -472,6 +544,28 @@ module TSOS {
                 case "7E" : {return '~'}
 
             }
+
+        }
+
+        public findNextEmptyBlock(): string {
+
+            for (var t = 1; t < 4; t++) {
+
+                for (var s = 0; s < 8; s++) {
+
+                    for (var b = 0; b < 8; b++) {
+
+                        var hddBlock: string = sessionStorage.getItem(t + s + b);
+                        if (hddBlock.charAt[0] === 0)
+                            return "" + t + s + b;
+
+                    }
+
+                }
+
+            }
+
+            return "999";
 
         }
 
