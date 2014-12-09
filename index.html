@@ -16,6 +16,7 @@
    <script type="text/javascript" src="dist/scripts/host/devices.js"></script>
    <script type="text/javascript" src="dist/scripts/host/cpu.js"></script>
    <script type="text/javascript" src="dist/scripts/host/memory.js"></script>
+   <script type="text/javascript" src="dist/scripts/host/hardDrive.js"></script>
 
    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="dist/scripts/os/interrupt.js"></script>
@@ -23,7 +24,9 @@
    <script type="text/javascript" src="dist/scripts/os/console.js"></script>
    <script type="text/javascript" src="dist/scripts/os/deviceDriver.js"></script>
    <script type="text/javascript" src="dist/scripts/os/deviceDriverKeyboard.js"></script>
+   <script type="text/javascript" src="dist/scripts/os/deviceDriverHDD.js"></script>
    <script type="text/javascript" src="dist/scripts/os/queue.js"></script>
+   <script type="text/javascript" src="dist/scripts/os/LazyPriorityQueue.js"></script>
    <script type="text/javascript" src="dist/scripts/os/shell.js"></script>
    <script type="text/javascript" src="dist/scripts/os/shellCommand.js"></script>
    <script type="text/javascript" src="dist/scripts/os/userCommand.js"></script>
@@ -175,6 +178,19 @@
                         </tr>
                     </thead>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="divHDDLabel" style="margin-left: 5px; margin-top: 75px;">
+        <label>
+            <b>Hard Drive:</b>
+        </label>
+        <br>
+
+        <div id="divHDD" style="border: black 5px; height:125px; width:650px; overflow:scroll; background-color:#FFFFFF;">
+            <div id="divHDDTable">
+                <table id="hddTable"></table>
             </div>
         </div>
     </div>

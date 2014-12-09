@@ -15,6 +15,8 @@ module TSOS {
         public quantumCycleCount: number;
         public procStatus: string;
         public loc: string;
+        public priority: number;
+        public swapFileName: string;
 
         public base: number;
         public limit: number;
@@ -31,12 +33,16 @@ module TSOS {
             this.zFlag = 0;
             this.quantumCycleCount = 0;
             this.procStatus = "N/A";
+            this.priority = 0;
+            this.swapFileName = "";
 
             this.base = (_ResidentPCBList[this.PID] - 1) * _MemBlockSize;
             this.limit = (_ResidentPCBList[this.PID] * _MemBlockSize) - 1;
 
             if ((_ResidentPCBList[this.PID] === 1) || (_ResidentPCBList[this.PID] === 2) || (_ResidentPCBList[this.PID] === 3))
                 this.loc = "Memory Block " + (_ResidentPCBList[this.PID] - 1);
+            else if (this.swapFileName !== "")
+                this.loc = "On Disk";
             else
                 this.loc = "Deleted from Memory";
 
@@ -52,6 +58,8 @@ module TSOS {
 
             if ((_ResidentPCBList[this.PID] === 1) || (_ResidentPCBList[this.PID] === 2) || (_ResidentPCBList[this.PID] === 3))
                 this.loc = "Memory Block " + (_ResidentPCBList[this.PID] - 1);
+            else if (this.swapFileName !== "")
+                this.loc = "On Disk";
             else
                 this.loc = "Deleted from Memory";
 

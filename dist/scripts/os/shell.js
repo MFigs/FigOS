@@ -109,6 +109,38 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellPS, "ps", "- Displays all currently active processes.");
             this.commandList[this.commandList.length] = sc;
 
+            //create <string>
+            sc = new TSOS.ShellCommand(this.shellCreate, "create", "<string> - Allows user to create a file with the name specified by the string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //read <string>
+            sc = new TSOS.ShellCommand(this.shellRead, "read", "<string> - Allows user to read a file with the name specified by the string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //delete <string>
+            sc = new TSOS.ShellCommand(this.shellDelete, "delete", "<string> - Allows user to delete a file with the name specified by the string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //write <string> <string>
+            sc = new TSOS.ShellCommand(this.shellWrite, "write", "<string> <string> - Allows user to write data to a file with the name specified by the first string parameter.");
+            this.commandList[this.commandList.length] = sc;
+
+            //format
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", "- Formats all tracks, sectors and blocks of the harddrive.");
+            this.commandList[this.commandList.length] = sc;
+
+            //setschedule <string>
+            sc = new TSOS.ShellCommand(this.shellSetSched, "setschedule", "<string> - Allows users to specify the process scheduling algorithm to be used by the operating system.");
+            this.commandList[this.commandList.length] = sc;
+
+            //getschedule
+            sc = new TSOS.ShellCommand(this.shellReturnSched, "getschedule", "- Returns the current process scheduling algorithm being used by the operating system.");
+            this.commandList[this.commandList.length] = sc;
+
+            //ls
+            sc = new TSOS.ShellCommand(this.shellLS, "ls", "- Returns a list of all user files currently stored on the hard drive.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -383,14 +415,26 @@ var TSOS;
             }
         };
 
-        // TODO: Fix load function to stop "enter" key from causing program to think hex code is invalid
-        Shell.prototype.shellLoad = function () {
+        Shell.prototype.shellLoad = function (args) {
             var programTextElem = document.getElementById("taProgramInput");
             var programStr = programTextElem.value.toString();
             programStr = programStr.replace(/\s/g, "");
 
             if ((_MemLoadedTable[0] === 1) && (_MemLoadedTable[1] === 1) && (_MemLoadedTable[2] === 1)) {
-                _StdOut.putText("Memory is Full... Please Clear Memory and Load Program Again...");
+                //_StdOut.putText("Memory is Full... Please Clear Memory and Load Program Again...");
+                _krnHDDDriver.createFile(".swap" + _SwapFileCounter, "krn");
+                _krnHDDDriver.writeFile(".swap" + _SwapFileCounter, programStr, "krn");
+                var diskPCB = new TSOS.ProcessControlBlock();
+                if (args.length === 1) {
+                    diskPCB.priority = args[0];
+                }
+                diskPCB.swapFileName = ".swap" + _SwapFileCounter;
+                _SwapFileCounter++;
+                _StdOut.putText("Loaded Program: PID " + diskPCB.PID + " To Disk");
+
+                _ResidentPCBList[diskPCB.PID] = 4;
+                _PCBArray[diskPCB.PID] = diskPCB;
+                _TerminatedProcessList[diskPCB.PID] = 0;
             } else {
                 var prevMemBlock = _CurrentMemBlock;
 
@@ -420,6 +464,10 @@ var TSOS;
                         if (isValidHex) {
                             _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
                             var pcb = new TSOS.ProcessControlBlock();
+
+                            if (args.length === 1)
+                                pcb.priority = args[0];
+
                             _PCBArray[pcb.PID] = pcb;
                             _ResidentPCBList[pcb.PID] = _CurrentMemBlock + 1;
                             _TerminatedProcessList[pcb.PID] = 0;
@@ -471,19 +519,14 @@ var TSOS;
         };
 
         Shell.prototype.shellQuantum = function (q) {
-            _Quantum = q;
+            if (_ProcessScheduler.scheduleAlgorithm == 0)
+                _Quantum = q;
+            else
+                _StdOut.putText("Error: Round Robin Scheduler Not Currently Active... Can't Alter Quantum At This Time");
         };
 
         Shell.prototype.shellKill = function (pid) {
-            if (_CPU.currentPID === pid) {
-                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
-                _PCBArray[pid].procStatus = "Terminated";
-                _TerminatedProcessList[pid] = 1;
-            } else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3)) {
-                _StdOut.putText("Invalid Process ID specified in kill command...");
-            } else {
-                _TerminatedProcessList[pid] = 1;
-            }
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(USER_PROCESS_KILL_IRQ, pid));
         };
 
         Shell.prototype.shellKillAll = function () {
@@ -505,7 +548,7 @@ var TSOS;
             var minActivePID = 999;
 
             for (var j = 0; j < _ResidentPCBList.length; j++) {
-                if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3)) {
+                if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3) || (_ResidentPCBList[j] === 4)) {
                     _PCBArray[j].updateStatus("Ready");
                     _PCBArray[j].updateLoc();
                     _ReadyQueue.enqueue(_PCBArray[j]);
@@ -538,6 +581,132 @@ var TSOS;
                     _StdOut.putText(pcb.PID + " ");
                 }
             }
+        };
+
+        Shell.prototype.shellCreate = function (args) {
+            _krnHDDDriver.createFile(args[0], "user");
+        };
+
+        Shell.prototype.shellRead = function (args) {
+            _krnHDDDriver.readFile(args[0], "user");
+        };
+
+        Shell.prototype.shellWrite = function (args) {
+            if (args[1].charAt(0) === "\"") {
+                var writeString = "" + args[1].substr(1);
+                if (writeString.indexOf("\"") !== -1) {
+                    writeString = writeString.slice(0, writeString.length - 1);
+                    _krnHDDDriver.writeFile(args[0], writeString, "user");
+                    return;
+                }
+                var i = 2;
+                var argum = args[i];
+                while (argum.indexOf("\"") === -1) {
+                    writeString = writeString + " " + argum;
+                    i++;
+                    argum = args[i];
+                }
+
+                argum = argum.slice(0, argum.length - 1);
+
+                writeString = writeString + " " + argum;
+
+                //console.log(writeString);
+                _krnHDDDriver.writeFile(args[0], writeString, "user");
+            }
+        };
+
+        Shell.prototype.shellDelete = function (args) {
+            _krnHDDDriver.deleteFile(args[0], "user");
+        };
+
+        Shell.prototype.shellFormat = function () {
+            _krnHDDDriver.formatHDD();
+        };
+
+        Shell.prototype.shellSetSched = function (scheduleAlgorithm) {
+            if (scheduleAlgorithm == "rr") {
+                if ((_ProcessScheduler.scheduleAlgorithm) !== 0 || (_ProcessScheduler.scheduleAlgorithm !== 1)) {
+                    if (_ReadyQueue.isEmpty())
+                        _ReadyQueue = new TSOS.Queue();
+                    else {
+                        var temp = new TSOS.Queue();
+                        while (!_ReadyQueue.isEmpty()) {
+                            temp.enqueue(_ReadyQueue.dequeue());
+                        }
+                        _ReadyQueue = temp;
+                    }
+                }
+                _ProcessScheduler.scheduleAlgorithm = 0;
+            } else if (scheduleAlgorithm == "fcfs") {
+                if ((_ProcessScheduler.scheduleAlgorithm) !== 0 || (_ProcessScheduler.scheduleAlgorithm !== 1)) {
+                    if (_ReadyQueue.isEmpty())
+                        _ReadyQueue = new TSOS.Queue();
+                    else {
+                        var temp = new TSOS.Queue();
+                        while (!_ReadyQueue.isEmpty()) {
+                            temp.enqueue(_ReadyQueue.dequeue());
+                        }
+                        _ReadyQueue = temp;
+                    }
+                }
+                _Quantum = Infinity;
+                _ProcessScheduler.scheduleAlgorithm = 1;
+            } else if (scheduleAlgorithm == "priority") {
+                if (((_ProcessScheduler.scheduleAlgorithm) === 0) || (_ProcessScheduler.scheduleAlgorithm === 1)) {
+                    if (_ReadyQueue.isEmpty())
+                        _ReadyQueue = new TSOS.LazyPriorityQueue();
+                    else {
+                        var temp1 = new TSOS.LazyPriorityQueue();
+                        while (!_ReadyQueue.isEmpty()) {
+                            temp1.enqueue(_ReadyQueue.dequeue());
+                        }
+                        _ReadyQueue = temp1;
+                    }
+                }
+                _ProcessScheduler.scheduleAlgorithm = 2;
+            } else
+                _StdOut.putText("Error: Invalid Scheduling Algorithm Specified... select \"rr\", \"fcfs\", or \"priority\"...");
+        };
+
+        Shell.prototype.shellLS = function (args) {
+            _StdOut.putText("File List:");
+            _StdOut.advanceLine();
+            var t = '0';
+            for (var s = 0; s < 8; s++) {
+                for (var b = 0; b < 8; b++) {
+                    var hddBlock = sessionStorage.getItem("" + t + s + b);
+                    if ((hddBlock.charAt(0) === "1") && (("" + t + s + b) !== "000")) {
+                        if (hddBlock.substr(4, 2) !== "2E") {
+                            var tempFileName = hddBlock.substr(4);
+
+                            //var star = "*", re = new RegExp(star, "g");
+                            //tempFileName = tempFileName.replace(re, "");
+                            var ch = tempFileName.charAt(0);
+                            var tempFileName2 = "";
+                            while (ch !== "*") {
+                                tempFileName2 = tempFileName2 + ch;
+                                tempFileName = tempFileName.substr(1);
+                                ch = tempFileName.charAt(0);
+                            }
+                            tempFileName2 = _krnHDDDriver.convertHexToString(tempFileName2);
+
+                            //console.log(tempFileName2);
+                            _StdOut.putText(tempFileName2);
+                            _StdOut.advanceLine();
+                        }
+                    }
+                }
+            }
+        };
+
+        Shell.prototype.shellReturnSched = function () {
+            if (_ProcessScheduler.scheduleAlgorithm === 0)
+                _StdOut.putText("Current Schedule Algorithm: Round Robin");
+            else if (_ProcessScheduler.scheduleAlgorithm === 1)
+                _StdOut.putText("Current Schedule Algorithm: First-Come First-Served");
+            else if (_ProcessScheduler.scheduleAlgorithm === 2)
+                _StdOut.putText("Current Schedule Algorithm: Priority");
         };
         return Shell;
     })();

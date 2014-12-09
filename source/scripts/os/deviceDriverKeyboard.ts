@@ -18,58 +18,6 @@ module TSOS {
             super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
         }
 
-        // TODO: Get below dictionary format to work in this program so as to replace the case statement implementation of symbol key recognition/printing
-
-        /*public symbolCharCodeASCIIMatch: {[keycode: string] : number[];} = {
-            '186' : [59], //;
-            '187' : [61], //=
-            '188' : [44], //,
-            '189' : [45], //-
-            '190' : [46], //.
-            '191' : [47], ///
-            '192' : [96], //`
-            '219' : [91], //[
-            '220' : [92], //\
-            '221' : [93], //]
-            '222' : [39]  //'
-        };
-
-        public symbolCharCodeASCIIMatchShift: {[keycode: string] : number[];} = {
-            '48' : [41],   //)
-            '49' : [33],   //!
-            '50' : [64],   //@
-            '51' : [35],   //#
-            '52' : [36],   //$
-            '53' : [37],   //%
-            '54' : [94],   //^
-            '55' : [38],   //&
-            '56' : [42],   /*//*
-            '57' : [40],   //(
-            '186' : [58],  //:
-            '187' : [43],  //+
-            '188' : [60],  //<
-            '189' : [95],  //_
-            '190' : [62],  //>
-            '191' : [63],  //?
-            '192' : [126], //~
-            '219' : [123], //{
-            '220' : [124], //|
-            '221' : [125], //}
-            '222' : [34]   //"
-        };
-
-        public findASCIIFromKeyCodeShift(keys: number): number {
-            if (keys in this.symbolCharCodeASCIIMatchShift) {
-                return this.symbolCharCodeASCIIMatchShift.keys[0];
-            }
-        }
-
-        public findASCIIFromKeyCode(keys: number): number {
-            if (keys in this.symbolCharCodeASCIIMatch) {
-                return this.symbolCharCodeASCIIMatch.keys[0];
-            }
-        }*/
-
         public krnKbdDriverEntry() {
             // Initialization routine for this, the kernel-mode Keyboard Device Driver.
             this.status = "loaded";

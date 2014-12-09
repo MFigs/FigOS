@@ -1,18 +1,24 @@
 /* TSOS.css */
 
 body {
-  background: #909193 url(../images/linen.png) repeat;
+  background: #0099CC/*#909193 url(../images/linen.png) repeat*/;
   font-family: Helvetica, Verdana, Arial, sans-serif;
   font-size: 12pt;
   font-weight: normal;
   font-style: normal;
+  /*color: white;*/
 }
 
 table {
     background: #DFDBC3;
     border: 1px solid black;
     padding: 2px;
+    color: black;
 
+}
+
+div {
+    color: black;
 }
 td {
     background: #FFFFFF;

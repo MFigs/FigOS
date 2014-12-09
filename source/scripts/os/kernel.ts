@@ -88,6 +88,12 @@ module TSOS {
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
 
+            // Load the HDD Devide Driver
+            this.krnTrace("Loading the HDD device driver.");
+            _krnHDDDriver = new TSOS.DeviceDriverHDD();
+            _krnHDDDriver.krnHDDDriverEntry();                   // Call the driverEntry() initialization routine.
+            this.krnTrace(_krnHDDDriver.status);
+
             //
             // ... more?
             //
@@ -188,6 +194,9 @@ module TSOS {
                 case TIMER_KILL_ACTIVE_IRQ:
                     this.krnTimerKillActiveProcISR();
                     break;
+                case USER_PROCESS_KILL_IRQ:
+                    this.krnProcessKillISR(params);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -204,6 +213,29 @@ module TSOS {
         public krnTimerKillActiveProcISR() {
 
         _ProcessScheduler.contextSwitchDrop();
+
+        }
+
+        public krnProcessKillISR(params) {
+
+            var pid: number = params[0];
+            if (_CPU.currentPID === pid) {
+                _KernelInterruptQueue.enqueue(new Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
+                _PCBArray[pid].procStatus = "Terminated";
+                _TerminatedProcessList[pid] = 1;
+            }
+            else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3) && (_ResidentPCBList[pid] !== 4)) {
+                _StdOut.putText("Invalid Process ID specified in kill command...");
+            }
+            else {
+                _TerminatedProcessList[pid] = 1;
+                for (var i = 0; i < _ReadyQueue.getSize(); i++) {
+                    var temp: TSOS.ProcessControlBlock = _ReadyQueue.q[i];
+                    if (temp.PID === pid) {
+                        _ReadyQueue.q.splice(i, 1);
+                    }
+                }
+            }
 
         }
 
@@ -254,6 +286,7 @@ module TSOS {
             this.memManager.updateMem();
             _Display.updateCPU();
             _Display.updateRQ();
+            _Display.updateHDD();
         }
 
     }

@@ -19,12 +19,39 @@ var TSOS;
             }
         };
 
+        MemoryManager.prototype.clearMemBlock = function (blockNumber) {
+            var base = blockNumber * _MemBlockSize;
+            var lim = base + _MemBlockSize - 1;
+
+            for (var r = base; r <= lim; r++) {
+                _MemoryArray.mem[r] = '00';
+            }
+
+            _MemLoadedTable[blockNumber] = 0;
+        };
+
+        MemoryManager.prototype.loadMemBlock = function (blockNumber) {
+            var base = blockNumber * _MemBlockSize;
+            var lim = base + _MemBlockSize - 1;
+            var output = "";
+
+            for (var s = base; s <= lim; s++) {
+                output = output + _MemoryArray.mem[s];
+            }
+
+            _MemLoadedTable[blockNumber] = 1;
+
+            return output;
+        };
+
         MemoryManager.prototype.clearMem = function () {
             _MemoryArray.clearMem();
             for (var i = 0; i < 3; i++)
                 _MemLoadedTable[i] = 0;
-            for (var j = 0; j < _ResidentPCBList.length; j++)
-                _ResidentPCBList[j] = 0;
+            for (var j = 0; j < _ResidentPCBList.length; j++) {
+                if (_ResidentPCBList[j] !== 4)
+                    _ResidentPCBList[j] = 0;
+            }
         };
 
         MemoryManager.prototype.storeMem = function (relativeAddress, valueToStore) {

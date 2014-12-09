@@ -23,6 +23,8 @@ var KEYBOARD_IRQ: number = 1;
 
 var TIMER_KILL_ACTIVE_IRQ: number = 2;
 
+var USER_PROCESS_KILL_IRQ: number = 3;
+
 
 //
 // Global Variables
@@ -66,6 +68,7 @@ var _SarcasticMode: boolean = false;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver = null;
+var _krnHDDDriver = null;
 
 var _hardwareClockID: number = null;
 
@@ -101,3 +104,7 @@ var _ProcessScheduler: TSOS.ProcessScheduler;
 var _TerminatedProcessList: number[];
 
 var _Quantum: number = 6;
+
+var _HDD: TSOS.HardDrive;
+var _SwapFileCounter: number = 1;
+var _TempSwapFileData: string = "";

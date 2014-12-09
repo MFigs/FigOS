@@ -21,6 +21,8 @@ var KEYBOARD_IRQ = 1;
 
 var TIMER_KILL_ACTIVE_IRQ = 2;
 
+var USER_PROCESS_KILL_IRQ = 3;
+
 //
 // Global Variables
 //
@@ -62,6 +64,7 @@ var _SarcasticMode = false;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver = null;
+var _krnHDDDriver = null;
 
 var _hardwareClockID = null;
 
@@ -96,3 +99,7 @@ var _ProcessScheduler;
 var _TerminatedProcessList;
 
 var _Quantum = 6;
+
+var _HDD;
+var _SwapFileCounter = 1;
+var _TempSwapFileData = "";
