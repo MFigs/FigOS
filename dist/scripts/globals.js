@@ -100,3 +100,4 @@ var _Quantum = 6;
 
 var _HDD;
 var _SwapFileCounter = 1;
+var _TempSwapFileData = "";

@@ -105,3 +105,4 @@ var _Quantum: number = 6;
 
 var _HDD: TSOS.HardDrive;
 var _SwapFileCounter: number = 1;
+var _TempSwapFileData: string = "";

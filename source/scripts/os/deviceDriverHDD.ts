@@ -107,7 +107,7 @@ module TSOS {
                 data += blockData;
                 blockData = sessionStorage.getItem(location);
                 nextLocation = blockData.substr(1, 3);
-                console.log("block jump while loop");
+                //console.log("block jump while loop");
 
             }
 
@@ -120,7 +120,7 @@ module TSOS {
                 tempFile1 = tempFile1 + ch1;
                 blockDataFinal = blockDataFinal.substr(1);
                 ch1 = blockDataFinal.charAt(0);
-                console.log("final data while loop");
+                //console.log("final data while loop");
             }
 
             blockDataFinal = tempFile1;
@@ -128,7 +128,11 @@ module TSOS {
             //blockDataFinal = blockDataFinal.replace('~', '');
             data += blockDataFinal;
 
-            _StdOut.putText(this.convertHexToString(data));
+            if ((access === "krn") && (fileName.charAt(0) === '.')) {
+                _TempSwapFileData = data;
+            }
+            else
+                _StdOut.putText(this.convertHexToString(data));
 
         }
 
@@ -139,31 +143,38 @@ module TSOS {
                 return;
             }
 
-            var fileNameHex = this.convertStringToHex(fileName);
-            //console.log(fileNameHex);
-            var t:string = "0";
-            var loc:string = "";
-            var fileFound: boolean = false;
-            var noSuchFileExists: boolean = false;
+            if ((fileName.charAt(0) !== '.') || ((access === "krn") && (fileName.charAt(0) === '.'))) {
 
-            for (var s = 0; s < 8; s++) {
+                var fileNameHex = this.convertStringToHex(fileName);
+                //console.log(fileNameHex);
+                var t:string = "0";
+                var loc:string = "";
+                var fileFound:boolean = false;
+                var noSuchFileExists:boolean = false;
 
-                for (var b = 0; b < 8; b++) {
+                for (var s = 0; s < 8; s++) {
 
-                    var hddBlock:string = sessionStorage.getItem("" + t + s + b);
-                    var possibleMatch:string = hddBlock.substr(4, fileName.length * 2);
-                    //console.log(possibleMatch);
+                    for (var b = 0; b < 8; b++) {
 
-                    if ((s === 7) && (b === 7) && (possibleMatch !== fileNameHex)) {
+                        var hddBlock:string = sessionStorage.getItem("" + t + s + b);
+                        var possibleMatch:string = hddBlock.substr(4, fileName.length * 2);
+                        //console.log(possibleMatch);
 
-                        noSuchFileExists = true;
+                        if ((s === 7) && (b === 7) && (possibleMatch !== fileNameHex)) {
 
-                    }
+                            noSuchFileExists = true;
 
-                    if (possibleMatch === fileNameHex) {
+                        }
 
-                        loc = t + s + b;
-                        fileFound = true;
+                        if (possibleMatch === fileNameHex) {
+
+                            loc = t + s + b;
+                            fileFound = true;
+
+                        }
+
+                        if (fileFound || noSuchFileExists)
+                            break;
 
                     }
 
@@ -172,40 +183,35 @@ module TSOS {
 
                 }
 
-                if (fileFound || noSuchFileExists)
-                    break;
+                if (noSuchFileExists) {
 
-            }
-
-            if (noSuchFileExists) {
-
-                _StdOut.putText("Error: No Such File Exists on Disk...");
-
-            }
-
-            else if (fileFound) {
-
-                //console.log(loc);
-                var hddB:string = sessionStorage.getItem(loc);
-                var blockData:string = hddB.substr(4);
-                var nextLoc:string = hddB.substr(1,3);
-
-                while (loc !== "&&&") {
-
-                    sessionStorage.setItem(loc, "0&&&" + blockData);
-                    loc = nextLoc;
-                    if (loc !== '&&&') {
-                        hddB = sessionStorage.getItem(loc);
-                        blockData = hddB.substr(4);
-                        nextLoc = hddB.substr(1, 3);
-                    }
+                    _StdOut.putText("Error: No Such File Exists on Disk...");
 
                 }
 
-                _StdOut.putText("File " + fileName + " Deleted From Disk");
+                else if (fileFound) {
 
+                    //console.log(loc);
+                    var hddB:string = sessionStorage.getItem(loc);
+                    var blockData:string = hddB.substr(4);
+                    var nextLoc:string = hddB.substr(1, 3);
+
+                    while (loc !== "&&&") {
+
+                        sessionStorage.setItem(loc, "0&&&" + blockData);
+                        loc = nextLoc;
+                        if (loc !== '&&&') {
+                            hddB = sessionStorage.getItem(loc);
+                            blockData = hddB.substr(4);
+                            nextLoc = hddB.substr(1, 3);
+                        }
+
+                    }
+
+                    _StdOut.putText("File " + fileName + " Deleted From Disk");
+
+                }
             }
-
 
         }
 
@@ -256,127 +262,131 @@ module TSOS {
                 return;
             }
 
-            var writeSuccess:boolean = false;
-            var writeFailure:boolean = false;
-            var fileNameFound:boolean = false;
-            var t:string = "0";
-            var thisLoc: string;
+            if ((fileName.charAt(0) !== '.') || ((access === "krn") && (fileName.charAt(0) === '.'))) {
+
+                var writeSuccess:boolean = false;
+                var writeFailure:boolean = false;
+                var fileNameFound:boolean = false;
+                var t:string = "0";
+                var thisLoc:string;
 
 
-            for (var s = 0; s < 8; s++) {
+                for (var s = 0; s < 8; s++) {
 
-                for (var b = 0; b < 8; b++) {
+                    for (var b = 0; b < 8; b++) {
 
-                    var hddBlock:string = sessionStorage.getItem(t + s + b);
+                        var hddBlock:string = sessionStorage.getItem(t + s + b);
 
-                    if ((s === 7) && (b === 7) && !fileNameFound) {
+                        if ((s === 7) && (b === 7) && !fileNameFound) {
 
-                        writeFailure = true;
-                        console.log("file not found");
-                        break;
+                            writeFailure = true;
+                            console.log("file not found");
+                            break;
 
-                    }
+                        }
 
-                    var tempFileName: string = this.convertHexToString(hddBlock.substr(4, fileName.length * 2));
-                    if (fileName === tempFileName) {
+                        var tempFileName:string = this.convertHexToString(hddBlock.substr(4, fileName.length * 2));
+                        if (fileName === tempFileName) {
 
-                        fileNameFound = true;
-                        //thisLoc = "" + t + s + b;
-                        console.log("file match found");
-                        if (hddBlock.substr(1,3) !== '&&&')
-                            var tempLoc = hddBlock.substr(1,3);
-                        else
-                            var tempLoc: string = this.findNextEmptyBlock();
-                        thisLoc = tempLoc;
-                        if (tempLoc !== '&&&') {
+                            fileNameFound = true;
+                            //thisLoc = "" + t + s + b;
+                            console.log("file match found");
+                            if (hddBlock.substr(1, 3) !== '&&&')
+                                var tempLoc = hddBlock.substr(1, 3);
+                            else
+                                var tempLoc:string = this.findNextEmptyBlock();
+                            thisLoc = tempLoc;
+                            if (tempLoc !== '&&&') {
 
-                            sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4));
-                            //this.clearOldData(tempLoc);
-                            //hddBlock = sessionStorage.getItem(tempLoc);
-                            console.log(dataString.length + "");
-                            while ((dataString.length >= 60) && (tempLoc !== '&&&')) {
+                                sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4));
+                                //this.clearOldData(tempLoc);
+                                //hddBlock = sessionStorage.getItem(tempLoc);
+                                console.log(dataString.length + "");
+                                while ((dataString.length >= 60) && (tempLoc !== '&&&')) {
 
-                                console.log("entered 60+ loop");
+                                    console.log("entered 60+ loop");
 
-                                hddBlock = sessionStorage.getItem(tempLoc);
+                                    hddBlock = sessionStorage.getItem(tempLoc);
 
-                                var tempData = dataString.substr(0, 60);
-                                dataString = dataString.substr(60);
-                                thisLoc = tempLoc;
-                                if (dataString.length > 0)
-                                    if (hddBlock.substr(1,3) !== '&&&')
-                                        tempLoc = hddBlock.substr(1,3);
+                                    var tempData = dataString.substr(0, 60);
+                                    dataString = dataString.substr(60);
+                                    thisLoc = tempLoc;
+                                    if (dataString.length > 0)
+                                        if (hddBlock.substr(1, 3) !== '&&&')
+                                            tempLoc = hddBlock.substr(1, 3);
+                                        else
+                                            tempLoc = this.findNextEmptyBlock();
                                     else
-                                        tempLoc = this.findNextEmptyBlock();
-                                else
-                                    tempLoc = '&&&';
-                                tempData = this.convertStringToHex(tempData);
-                                sessionStorage.setItem(thisLoc, '1' + tempLoc + tempData);
-
-                            }
-
-                            if ((dataString.length > 0) && (tempLoc === '&&&')) {
-
-                                //_StdOut.putText('ERROR: MEMORY FULL... PLEASE CLEAR MEMORY');
-                                console.log("len > 0 but tempLoc == &&&");
-                                writeFailure = true;
-
-                            }
-
-                            else if ((dataString.length > 0) && (tempLoc !== '&&&') && !writeFailure) {
-
-                                var lastData = '';
-
-                                for (var j = 0; j < 60; j++) {
-
-                                    if (dataString.length > 0) {
-                                        lastData = lastData + this.charToHex(dataString.charAt(0));
-                                        dataString = dataString.substr(1);
-                                    }
-                                    else
-                                        lastData = lastData + '~~';
+                                        tempLoc = '&&&';
+                                    tempData = this.convertStringToHex(tempData);
+                                    sessionStorage.setItem(thisLoc, '1' + tempLoc + tempData);
 
                                 }
 
-                                sessionStorage.setItem(thisLoc, '1&&&' + lastData);
-                                console.log("last data written");
-                                writeSuccess = true;
+                                if ((dataString.length > 0) && (tempLoc === '&&&')) {
+
+                                    //_StdOut.putText('ERROR: MEMORY FULL... PLEASE CLEAR MEMORY');
+                                    console.log("len > 0 but tempLoc == &&&");
+                                    writeFailure = true;
+
+                                }
+
+                                else if ((dataString.length > 0) && (tempLoc !== '&&&') && !writeFailure) {
+
+                                    var lastData = '';
+
+                                    for (var j = 0; j < 60; j++) {
+
+                                        if (dataString.length > 0) {
+                                            lastData = lastData + this.charToHex(dataString.charAt(0));
+                                            dataString = dataString.substr(1);
+                                        }
+                                        else
+                                            lastData = lastData + '~~';
+
+                                    }
+
+                                    sessionStorage.setItem(thisLoc, '1&&&' + lastData);
+                                    console.log("last data written");
+                                    writeSuccess = true;
+
+                                }
+
 
                             }
 
+                            else {
+                                //_StdOut.putText('ERROR: MEMORY FULL... PLEASE CLEAR MEMORY');
+                                console.log("no space found to write");
+                                writeFailure = true;
+                            }
 
                         }
 
-                        else {
-                            //_StdOut.putText('ERROR: MEMORY FULL... PLEASE CLEAR MEMORY');
-                            console.log("no space found to write");
-                            writeFailure = true;
-                        }
+                        //else {
+                        //_StdOut.putText("ERROR: SPECIFIED FILE COULD NOT BE FOUND");
+                        //    writeFailure = true;
+                        //}
+
+
+                        if (writeSuccess || writeFailure)
+                            break;
 
                     }
-
-                    //else {
-                    //_StdOut.putText("ERROR: SPECIFIED FILE COULD NOT BE FOUND");
-                    //    writeFailure = true;
-                    //}
-
 
                     if (writeSuccess || writeFailure)
                         break;
 
                 }
 
-                if (writeSuccess || writeFailure)
-                    break;
+
+                if (writeSuccess)
+                    _StdOut.putText("File Written");
+
+                else if (writeFailure)
+                    _StdOut.putText("Error: Memory Full... File Not Written");
 
             }
-
-
-            if (writeSuccess)
-                _StdOut.putText("File Written");
-
-            else if (writeFailure)
-                _StdOut.putText("Error: Memory Full... File Not Written");
 
         }
 
