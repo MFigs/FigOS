@@ -68,19 +68,19 @@ module TSOS {
                         if (hddBlock === fileName.trim()) {
 
                             location = loc;
-                            break;
+                            //break;
 
                         }
 
                     }
 
-                    if (location !== "")
-                        break;
+                    //if (location !== "")
+                        //break;
 
                 }
 
-                if (location !== "")
-                    break;
+                //if (location !== "")
+                    //break;
 
             }
 
@@ -105,6 +105,7 @@ module TSOS {
         public deleteFile(fileName: string) {
 
             var fileNameHex = this.convertStringToHex(fileName);
+            console.log(fileNameHex);
             var t:string = "0";
             var loc:string = "";
             var fileFound: boolean = false;
@@ -114,17 +115,19 @@ module TSOS {
 
                 for (var b = 0; b < 8; b++) {
 
-                    var hddBlock:string = sessionStorage.getItem(t + s + b);
+                    var hddBlock:string = sessionStorage.getItem("" + t + s + b);
+                    var possibleMatch:string = hddBlock.substr(4, fileName.length * 2);
+                    console.log(possibleMatch);
 
-                    if ((s === 7) && (b === 7) && (hddBlock.substr(4) !== fileNameHex)) {
+                    if ((s === 7) && (b === 7) && (possibleMatch !== fileNameHex)) {
 
                         noSuchFileExists = true;
 
                     }
 
-                    if (hddBlock.substr(4) === fileNameHex) {
+                    if (possibleMatch === fileNameHex) {
 
-                        loc = (t + s + b);
+                        loc = t + s + b;
                         fileFound = true;
 
                     }
@@ -141,23 +144,26 @@ module TSOS {
 
             if (noSuchFileExists) {
 
-                _StdOut.putText("Error: No Such File Exists on Disk... No Files Deleted");
+                _StdOut.putText("Error: No Such File Exists on Disk...");
 
             }
 
             else if (fileFound) {
 
-                var hddBlock:string = sessionStorage.getItem(loc);
-                var blockData:string = hddBlock.substr(4);
-                var nextLoc:string = hddBlock.substr(1,3);
+                console.log(loc);
+                var hddB:string = sessionStorage.getItem(loc);
+                var blockData:string = hddB.substr(4);
+                var nextLoc:string = hddB.substr(1,3);
 
                 while (loc !== "&&&") {
 
                     sessionStorage.setItem(loc, "0&&&" + blockData);
                     loc = nextLoc;
-                    hddBlock = sessionStorage.getItem(loc);
-                    blockData = hddBlock.substr(4);
-                    nextLoc = hddBlock.substr(1,3);
+                    if (loc !== '&&&') {
+                        hddB = sessionStorage.getItem(loc);
+                        blockData = hddB.substr(4);
+                        nextLoc = hddB.substr(1, 3);
+                    }
 
                 }
 
@@ -170,66 +176,36 @@ module TSOS {
 
         public createFile(fileName:string) {
 
-            var createSuccess:boolean = false;
-            var createFailure:boolean = false;
-            var t:string = "0";
+            var fn:string = fileName;
 
+            var fileLoc:string = this.findNextEmptyNameBlock();
+            if (fileLoc === '&&&') {
+                _StdOut.putText('ERROR: FILE NAME MEMORY ON HDD FULL');
+            }
+            else {
 
-            for (var s = 0; s < 8; s++) {
+                var storeString:string = '';
+                var len: number = fileName.length;
 
-                for (var b = 0; b < 8; b++) {
+                for (var i = 0; i < 60; i++) {
 
-                    var hddBlock:string = sessionStorage.getItem(t + s + b);
+                    if (i < len) {
 
-                    if ((s === 7) && (b === 7) && (hddBlock.charAt(0) === '1')) {
-
-                        createFailure = true;
-                        break;
-
-                    }
-
-                    if (hddBlock.charAt(0) === '0') {
-
-                        var storeString:string = "1&&&";
-
-                        for (var i = 4; i < 64; i++) {
-
-                            if (fileName.length != 0) {
-
-                                var ch:string = fileName.charAt(0);
-                                storeString = storeString + this.charToHex(ch);
-                                fileName = fileName.slice(1);
-
-                            }
-                            else {
-
-                                storeString = storeString + '**';
-
-                            }
-
-                        }
-
-                        sessionStorage.setItem(t + s + b, storeString);
-                        createSuccess = true;
+                        var ch:string = fileName.charAt(i);
+                        storeString = storeString + this.charToHex(ch);
 
                     }
+                    else {
 
-                    if (createSuccess || createFailure)
-                        break;
+                        storeString = storeString + '**';
+
+                    }
 
                 }
 
-                if (createSuccess || createFailure)
-                    break;
-
+                sessionStorage.setItem(fileLoc, '1&&&' + storeString);
+                _StdOut.putText("File " + fn + " Created On Disk")
             }
-
-
-            if (createSuccess)
-                _StdOut.putText("File Created");
-
-            else if (createFailure)
-                _StdOut.putText("Error: Memory Full... File Not Created");
 
         }
 
@@ -239,6 +215,7 @@ module TSOS {
             var writeFailure:boolean = false;
             var fileNameFound:boolean = false;
             var t:string = "0";
+            var thisLoc: string;
 
 
             for (var s = 0; s < 8; s++) {
@@ -250,47 +227,94 @@ module TSOS {
                     if ((s === 7) && (b === 7) && !fileNameFound) {
 
                         writeFailure = true;
+                        console.log("file not found");
                         break;
 
                     }
 
-                    var tempFileName: string = this.convertHexToString(hddBlock.substr(4, 120)).replace('*', '');
+                    var tempFileName: string = this.convertHexToString(hddBlock.substr(4, fileName.length * 2));
                     if (fileName === tempFileName) {
 
-                        var tempLoc: string = this.findNextEmptyBlock();
-                        if (tempLoc !== '999') {
+                        fileNameFound = true;
+                        //thisLoc = "" + t + s + b;
+                        console.log("file match found");
+                        if (hddBlock.substr(1,3) !== '&&&')
+                            var tempLoc = hddBlock.substr(1,3);
+                        else
+                            var tempLoc: string = this.findNextEmptyBlock();
+                        thisLoc = tempLoc;
+                        if (tempLoc !== '&&&') {
 
-                            sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4, 120));
+                            sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4));
+                            //this.clearOldData(tempLoc);
+                            //hddBlock = sessionStorage.getItem(tempLoc);
+                            console.log(dataString.length + "");
+                            while ((dataString.length >= 60) && (tempLoc !== '&&&')) {
+
+                                console.log("entered 60+ loop");
+
+                                hddBlock = sessionStorage.getItem(tempLoc);
+
+                                var tempData = dataString.substr(0, 60);
+                                dataString = dataString.substr(60);
+                                thisLoc = tempLoc;
+                                if (dataString.length > 0)
+                                    if (hddBlock.substr(1,3) !== '&&&')
+                                        tempLoc = hddBlock.substr(1,3);
+                                    else
+                                        tempLoc = this.findNextEmptyBlock();
+                                else
+                                    tempLoc = '&&&';
+                                tempData = this.convertStringToHex(tempData);
+                                sessionStorage.setItem(thisLoc, '1' + tempLoc + tempData);
+
+                            }
+
+                            if ((dataString.length > 0) && (tempLoc === '&&&')) {
+
+                                //_StdOut.putText('ERROR: MEMORY FULL... PLEASE CLEAR MEMORY');
+                                console.log("len > 0 but tempLoc == &&&");
+                                writeFailure = true;
+
+                            }
+
+                            else if ((dataString.length > 0) && (tempLoc !== '&&&') && !writeFailure) {
+
+                                var lastData = '';
+
+                                for (var j = 0; j < 60; j++) {
+
+                                    if (dataString.length > 0) {
+                                        lastData = lastData + this.charToHex(dataString.charAt(0));
+                                        dataString = dataString.substr(1);
+                                    }
+                                    else
+                                        lastData = lastData + '~~';
+
+                                }
+
+                                sessionStorage.setItem(thisLoc, '1&&&' + lastData);
+                                console.log("last data written");
+                                writeSuccess = true;
+
+                            }
 
 
                         }
 
-                    }
-                    if (hddBlock.charAt(0) === '0') {
-
-                        var storeString:string = "1&&&";
-
-                        for (var i = 4; i < 64; i++) {
-
-                            if (fileName.length != 0) {
-
-                                var ch:string = fileName.charAt(0);
-                                storeString = storeString + this.charToHex(ch);
-                                fileName = fileName.slice(1);
-
-                            }
-                            else {
-
-                                storeString = storeString + '**';
-
-                            }
-
+                        else {
+                            //_StdOut.putText('ERROR: MEMORY FULL... PLEASE CLEAR MEMORY');
+                            console.log("no space found to write");
+                            writeFailure = true;
                         }
 
-                        sessionStorage.setItem(t + s + b, storeString);
-                        writeSuccess = true;
-
                     }
+
+                    //else {
+                        //_StdOut.putText("ERROR: SPECIFIED FILE COULD NOT BE FOUND");
+                    //    writeFailure = true;
+                    //}
+
 
                     if (writeSuccess || writeFailure)
                         break;
@@ -304,10 +328,10 @@ module TSOS {
 
 
             if (writeSuccess)
-                _StdOut.putText("File Created");
+                _StdOut.putText("File Written");
 
             else if (writeFailure)
-                _StdOut.putText("Error: Memory Full... File Not Created");
+                _StdOut.putText("Error: Memory Full... File Not Written");
 
         }
 
@@ -549,15 +573,19 @@ module TSOS {
 
         public findNextEmptyBlock(): string {
 
+            var spaceFound:boolean = false;
+
             for (var t = 1; t < 4; t++) {
 
                 for (var s = 0; s < 8; s++) {
 
                     for (var b = 0; b < 8; b++) {
 
-                        var hddBlock: string = sessionStorage.getItem(t + s + b);
-                        if (hddBlock.charAt[0] === 0)
+                        var hddBlock: string = sessionStorage.getItem("" + t + s + b);
+                        if (hddBlock.charAt(0) === '0') {
+                            spaceFound = true;
                             return "" + t + s + b;
+                        }
 
                     }
 
@@ -565,10 +593,42 @@ module TSOS {
 
             }
 
-            return "999";
+            if (!spaceFound)
+                return "&&&";
+
+        }
+
+        public findNextEmptyNameBlock(): string {
+
+            var t: string = '0';
+
+            for (var s = 0; s < 8; s++) {
+
+                for (var b = 0; b < 8; b++) {
+
+                    var hddBlock: string = sessionStorage.getItem('' + t + s + b);
+                    if (hddBlock.charAt(0) === '0') {
+                        console.log("" + t + s + b);
+                        return "" + t + s + b;
+                    }
+
+                }
+
+            }
+
+            return "&&&";
+
+        }
+
+        public clearOldData(hddLoc: string) {
+
+            var temp: string = sessionStorage.getItem(hddLoc);
+
+            sessionStorage.setItem(hddLoc, temp.substr(0, 4) + '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
 
         }
 
     }
+
 
 }

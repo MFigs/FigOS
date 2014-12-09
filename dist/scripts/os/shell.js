@@ -575,20 +575,20 @@ var TSOS;
             }
         };
 
-        Shell.prototype.shellCreate = function (filename) {
-            _HDD.createFile(filename);
+        Shell.prototype.shellCreate = function (args) {
+            _HDD.createFile(args[0]);
         };
 
-        Shell.prototype.shellRead = function (filename) {
-            _HDD.readFile(filename);
+        Shell.prototype.shellRead = function (args) {
+            _HDD.readFile(args[0]);
         };
 
-        Shell.prototype.shellWrite = function (filename, data) {
-            _HDD.writeFile(filename, data);
+        Shell.prototype.shellWrite = function (args) {
+            _HDD.writeFile(args[0], args[1]);
         };
 
-        Shell.prototype.shellDelete = function (filename) {
-            _HDD.deleteFile(filename);
+        Shell.prototype.shellDelete = function (args) {
+            _HDD.deleteFile(args[0]);
         };
 
         Shell.prototype.shellFormat = function () {

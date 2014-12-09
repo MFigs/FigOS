@@ -45,16 +45,14 @@ var TSOS;
 
                         if (hddBlock === fileName.trim()) {
                             location = loc;
-                            break;
+                            //break;
                         }
                     }
-
-                    if (location !== "")
-                        break;
+                    //if (location !== "")
+                    //break;
                 }
-
-                if (location !== "")
-                    break;
+                //if (location !== "")
+                //break;
             }
 
             while (location !== "&&&") {
@@ -74,6 +72,7 @@ var TSOS;
 
         HardDrive.prototype.deleteFile = function (fileName) {
             var fileNameHex = this.convertStringToHex(fileName);
+            console.log(fileNameHex);
             var t = "0";
             var loc = "";
             var fileFound = false;
@@ -81,14 +80,16 @@ var TSOS;
 
             for (var s = 0; s < 8; s++) {
                 for (var b = 0; b < 8; b++) {
-                    var hddBlock = sessionStorage.getItem(t + s + b);
+                    var hddBlock = sessionStorage.getItem("" + t + s + b);
+                    var possibleMatch = hddBlock.substr(4, fileName.length * 2);
+                    console.log(possibleMatch);
 
-                    if ((s === 7) && (b === 7) && (hddBlock.substr(4) !== fileNameHex)) {
+                    if ((s === 7) && (b === 7) && (possibleMatch !== fileNameHex)) {
                         noSuchFileExists = true;
                     }
 
-                    if (hddBlock.substr(4) === fileNameHex) {
-                        loc = (t + s + b);
+                    if (possibleMatch === fileNameHex) {
+                        loc = t + s + b;
                         fileFound = true;
                     }
 
@@ -101,18 +102,21 @@ var TSOS;
             }
 
             if (noSuchFileExists) {
-                _StdOut.putText("Error: No Such File Exists on Disk... No Files Deleted");
+                _StdOut.putText("Error: No Such File Exists on Disk...");
             } else if (fileFound) {
-                var hddBlock = sessionStorage.getItem(loc);
-                var blockData = hddBlock.substr(4);
-                var nextLoc = hddBlock.substr(1, 3);
+                console.log(loc);
+                var hddB = sessionStorage.getItem(loc);
+                var blockData = hddB.substr(4);
+                var nextLoc = hddB.substr(1, 3);
 
                 while (loc !== "&&&") {
                     sessionStorage.setItem(loc, "0&&&" + blockData);
                     loc = nextLoc;
-                    hddBlock = sessionStorage.getItem(loc);
-                    blockData = hddBlock.substr(4);
-                    nextLoc = hddBlock.substr(1, 3);
+                    if (loc !== '&&&') {
+                        hddB = sessionStorage.getItem(loc);
+                        blockData = hddB.substr(4);
+                        nextLoc = hddB.substr(1, 3);
+                    }
                 }
 
                 _StdOut.putText("File " + fileName + " Deleted From Disk");
@@ -120,48 +124,27 @@ var TSOS;
         };
 
         HardDrive.prototype.createFile = function (fileName) {
-            var createSuccess = false;
-            var createFailure = false;
-            var t = "0";
+            var fn = fileName;
 
-            for (var s = 0; s < 8; s++) {
-                for (var b = 0; b < 8; b++) {
-                    var hddBlock = sessionStorage.getItem(t + s + b);
+            var fileLoc = this.findNextEmptyNameBlock();
+            if (fileLoc === '&&&') {
+                _StdOut.putText('ERROR: FILE NAME MEMORY ON HDD FULL');
+            } else {
+                var storeString = '';
+                var len = fileName.length;
 
-                    if ((s === 7) && (b === 7) && (hddBlock.charAt(0) === '1')) {
-                        createFailure = true;
-                        break;
+                for (var i = 0; i < 60; i++) {
+                    if (i < len) {
+                        var ch = fileName.charAt(i);
+                        storeString = storeString + this.charToHex(ch);
+                    } else {
+                        storeString = storeString + '**';
                     }
-
-                    if (hddBlock.charAt(0) === '0') {
-                        var storeString = "1&&&";
-
-                        for (var i = 4; i < 64; i++) {
-                            if (fileName.length != 0) {
-                                var ch = fileName.charAt(0);
-                                storeString = storeString + this.charToHex(ch);
-                                fileName = fileName.slice(1);
-                            } else {
-                                storeString = storeString + '**';
-                            }
-                        }
-
-                        sessionStorage.setItem(t + s + b, storeString);
-                        createSuccess = true;
-                    }
-
-                    if (createSuccess || createFailure)
-                        break;
                 }
 
-                if (createSuccess || createFailure)
-                    break;
+                sessionStorage.setItem(fileLoc, '1&&&' + storeString);
+                _StdOut.putText("File " + fn + " Created On Disk");
             }
-
-            if (createSuccess)
-                _StdOut.putText("File Created");
-            else if (createFailure)
-                _StdOut.putText("Error: Memory Full... File Not Created");
         };
 
         HardDrive.prototype.writeFile = function (fileName, dataString) {
@@ -169,6 +152,7 @@ var TSOS;
             var writeFailure = false;
             var fileNameFound = false;
             var t = "0";
+            var thisLoc;
 
             for (var s = 0; s < 8; s++) {
                 for (var b = 0; b < 8; b++) {
@@ -176,33 +160,76 @@ var TSOS;
 
                     if ((s === 7) && (b === 7) && !fileNameFound) {
                         writeFailure = true;
+                        console.log("file not found");
                         break;
                     }
 
-                    var tempFileName = this.convertHexToString(hddBlock.substr(4, 120)).replace('*', '');
+                    var tempFileName = this.convertHexToString(hddBlock.substr(4, fileName.length * 2));
                     if (fileName === tempFileName) {
-                        var tempLoc = this.findNextEmptyBlock();
-                        if (tempLoc !== '999') {
-                            sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4, 120));
-                        }
-                    }
-                    if (hddBlock.charAt(0) === '0') {
-                        var storeString = "1&&&";
+                        fileNameFound = true;
 
-                        for (var i = 4; i < 64; i++) {
-                            if (fileName.length != 0) {
-                                var ch = fileName.charAt(0);
-                                storeString = storeString + this.charToHex(ch);
-                                fileName = fileName.slice(1);
-                            } else {
-                                storeString = storeString + '**';
+                        //thisLoc = "" + t + s + b;
+                        console.log("file match found");
+                        if (hddBlock.substr(1, 3) !== '&&&')
+                            var tempLoc = hddBlock.substr(1, 3);
+                        else
+                            var tempLoc = this.findNextEmptyBlock();
+                        thisLoc = tempLoc;
+                        if (tempLoc !== '&&&') {
+                            sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4));
+
+                            //this.clearOldData(tempLoc);
+                            //hddBlock = sessionStorage.getItem(tempLoc);
+                            console.log(dataString.length + "");
+                            while ((dataString.length >= 60) && (tempLoc !== '&&&')) {
+                                console.log("entered 60+ loop");
+
+                                hddBlock = sessionStorage.getItem(tempLoc);
+
+                                var tempData = dataString.substr(0, 60);
+                                dataString = dataString.substr(60);
+                                thisLoc = tempLoc;
+                                if (dataString.length > 0)
+                                    if (hddBlock.substr(1, 3) !== '&&&')
+                                        tempLoc = hddBlock.substr(1, 3);
+                                    else
+                                        tempLoc = this.findNextEmptyBlock();
+                                else
+                                    tempLoc = '&&&';
+                                tempData = this.convertStringToHex(tempData);
+                                sessionStorage.setItem(thisLoc, '1' + tempLoc + tempData);
                             }
-                        }
 
-                        sessionStorage.setItem(t + s + b, storeString);
-                        writeSuccess = true;
+                            if ((dataString.length > 0) && (tempLoc === '&&&')) {
+                                //_StdOut.putText('ERROR: MEMORY FULL... PLEASE CLEAR MEMORY');
+                                console.log("len > 0 but tempLoc == &&&");
+                                writeFailure = true;
+                            } else if ((dataString.length > 0) && (tempLoc !== '&&&') && !writeFailure) {
+                                var lastData = '';
+
+                                for (var j = 0; j < 60; j++) {
+                                    if (dataString.length > 0) {
+                                        lastData = lastData + this.charToHex(dataString.charAt(0));
+                                        dataString = dataString.substr(1);
+                                    } else
+                                        lastData = lastData + '~~';
+                                }
+
+                                sessionStorage.setItem(thisLoc, '1&&&' + lastData);
+                                console.log("last data written");
+                                writeSuccess = true;
+                            }
+                        } else {
+                            //_StdOut.putText('ERROR: MEMORY FULL... PLEASE CLEAR MEMORY');
+                            console.log("no space found to write");
+                            writeFailure = true;
+                        }
                     }
 
+                    //else {
+                    //_StdOut.putText("ERROR: SPECIFIED FILE COULD NOT BE FOUND");
+                    //    writeFailure = true;
+                    //}
                     if (writeSuccess || writeFailure)
                         break;
                 }
@@ -212,9 +239,9 @@ var TSOS;
             }
 
             if (writeSuccess)
-                _StdOut.putText("File Created");
+                _StdOut.putText("File Written");
             else if (writeFailure)
-                _StdOut.putText("Error: Memory Full... File Not Created");
+                _StdOut.putText("Error: Memory Full... File Not Written");
         };
 
         HardDrive.prototype.convertStringToHex = function (data) {
@@ -818,17 +845,44 @@ var TSOS;
         };
 
         HardDrive.prototype.findNextEmptyBlock = function () {
+            var spaceFound = false;
+
             for (var t = 1; t < 4; t++) {
                 for (var s = 0; s < 8; s++) {
                     for (var b = 0; b < 8; b++) {
-                        var hddBlock = sessionStorage.getItem(t + s + b);
-                        if (hddBlock.charAt[0] === 0)
+                        var hddBlock = sessionStorage.getItem("" + t + s + b);
+                        if (hddBlock.charAt(0) === '0') {
+                            spaceFound = true;
                             return "" + t + s + b;
+                        }
                     }
                 }
             }
 
-            return "999";
+            if (!spaceFound)
+                return "&&&";
+        };
+
+        HardDrive.prototype.findNextEmptyNameBlock = function () {
+            var t = '0';
+
+            for (var s = 0; s < 8; s++) {
+                for (var b = 0; b < 8; b++) {
+                    var hddBlock = sessionStorage.getItem('' + t + s + b);
+                    if (hddBlock.charAt(0) === '0') {
+                        console.log("" + t + s + b);
+                        return "" + t + s + b;
+                    }
+                }
+            }
+
+            return "&&&";
+        };
+
+        HardDrive.prototype.clearOldData = function (hddLoc) {
+            var temp = sessionStorage.getItem(hddLoc);
+
+            sessionStorage.setItem(hddLoc, temp.substr(0, 4) + '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
         };
         return HardDrive;
     })();

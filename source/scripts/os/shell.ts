@@ -675,27 +675,27 @@ module TSOS {
 
         }
 
-        public shellCreate(filename: string) {
+        public shellCreate(args) {
 
-            _HDD.createFile(filename);
-
-        }
-
-        public shellRead(filename: string) {
-
-            _HDD.readFile(filename);
+            _HDD.createFile(args[0]);
 
         }
 
-        public shellWrite(filename: string, data: string) {
+        public shellRead(args) {
 
-            _HDD.writeFile(filename, data);
+            _HDD.readFile(args[0]);
 
         }
 
-        public shellDelete(filename: string) {
+        public shellWrite(args) {
 
-            _HDD.deleteFile(filename);
+            _HDD.writeFile(args[0], args[1]);
+
+        }
+
+        public shellDelete(args) {
+
+            _HDD.deleteFile(args[0]);
 
         }
 
