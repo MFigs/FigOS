@@ -4,6 +4,8 @@ module TSOS {
 
         // Process Scheduling Algorithms:
         // 0: Round Robin
+        // 1: First Come, First Served
+        // 2: Priority
 
         public scheduleAlgorithm: number;
         public programCount: number;

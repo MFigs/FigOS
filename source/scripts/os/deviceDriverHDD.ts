@@ -318,7 +318,7 @@ module TSOS {
                                 //console.log(dataString.length + "");
                                 while ((dataString.length >= 60) && (tempLoc !== '&&&')) {
 
-                                    console.log("entered 60+ loop");
+                                    //console.log("entered 60+ loop");
 
                                     hddBlock = sessionStorage.getItem(tempLoc);
 
@@ -688,7 +688,7 @@ module TSOS {
 
                     var hddBlock: string = sessionStorage.getItem('' + t + s + b);
                     if (hddBlock.charAt(0) === '0') {
-                        console.log("" + t + s + b);
+                        //console.log("" + t + s + b);
                         return "" + t + s + b;
                     }
 

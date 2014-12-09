@@ -489,6 +489,9 @@ module TSOS {
                 _krnHDDDriver.createFile(".swap" + _SwapFileCounter, "krn");
                 _krnHDDDriver.writeFile(".swap" + _SwapFileCounter, programStr, "krn");
                 var diskPCB = new ProcessControlBlock();
+                if (args.length === 1) {
+                    diskPCB.priority = args[0];
+                }
                 diskPCB.swapFileName = ".swap" + _SwapFileCounter;
                 _SwapFileCounter++;
                 _StdOut.putText("Loaded Program: PID " + diskPCB.PID + " To Disk");
@@ -536,7 +539,7 @@ module TSOS {
                             _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
                             var pcb = new ProcessControlBlock();
 
-                            if(arguments.length === 1)
+                            if(args.length === 1)
                                 pcb.priority = args[0];
 
                             _PCBArray[pcb.PID] = pcb;
@@ -612,7 +615,7 @@ module TSOS {
 
         public shellKill(pid: number) {
 
-            _KernelInterruptQueue.enqueue(new Interrupt(USER_PROCESS_KILL_IRQ, [pid]));
+            _KernelInterruptQueue.enqueue(new Interrupt(USER_PROCESS_KILL_IRQ, pid));
 
         }
 
@@ -766,7 +769,7 @@ module TSOS {
                 _ProcessScheduler.scheduleAlgorithm = 1;
             }
             else if (scheduleAlgorithm == "priority") {
-                if((_ProcessScheduler.scheduleAlgorithm) === 0 || (_ProcessScheduler.scheduleAlgorithm === 1)) {
+                if(((_ProcessScheduler.scheduleAlgorithm) === 0) || (_ProcessScheduler.scheduleAlgorithm === 1)) {
                     if (_ReadyQueue.isEmpty())
                         _ReadyQueue = new TSOS.LazyPriorityQueue();
                     else {

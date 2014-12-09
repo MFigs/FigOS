@@ -425,6 +425,9 @@ var TSOS;
                 _krnHDDDriver.createFile(".swap" + _SwapFileCounter, "krn");
                 _krnHDDDriver.writeFile(".swap" + _SwapFileCounter, programStr, "krn");
                 var diskPCB = new TSOS.ProcessControlBlock();
+                if (args.length === 1) {
+                    diskPCB.priority = args[0];
+                }
                 diskPCB.swapFileName = ".swap" + _SwapFileCounter;
                 _SwapFileCounter++;
                 _StdOut.putText("Loaded Program: PID " + diskPCB.PID + " To Disk");
@@ -462,7 +465,7 @@ var TSOS;
                             _Kernel.memManager.loadMem(_CurrentMemBlock, programStr);
                             var pcb = new TSOS.ProcessControlBlock();
 
-                            if (arguments.length === 1)
+                            if (args.length === 1)
                                 pcb.priority = args[0];
 
                             _PCBArray[pcb.PID] = pcb;
@@ -523,7 +526,7 @@ var TSOS;
         };
 
         Shell.prototype.shellKill = function (pid) {
-            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(USER_PROCESS_KILL_IRQ, [pid]));
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(USER_PROCESS_KILL_IRQ, pid));
         };
 
         Shell.prototype.shellKillAll = function () {
@@ -650,7 +653,7 @@ var TSOS;
                 _Quantum = Infinity;
                 _ProcessScheduler.scheduleAlgorithm = 1;
             } else if (scheduleAlgorithm == "priority") {
-                if ((_ProcessScheduler.scheduleAlgorithm) === 0 || (_ProcessScheduler.scheduleAlgorithm === 1)) {
+                if (((_ProcessScheduler.scheduleAlgorithm) === 0) || (_ProcessScheduler.scheduleAlgorithm === 1)) {
                     if (_ReadyQueue.isEmpty())
                         _ReadyQueue = new TSOS.LazyPriorityQueue();
                     else {

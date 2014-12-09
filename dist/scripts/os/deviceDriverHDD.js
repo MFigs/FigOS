@@ -259,8 +259,7 @@ var TSOS;
                                 sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4));
 
                                 while ((dataString.length >= 60) && (tempLoc !== '&&&')) {
-                                    console.log("entered 60+ loop");
-
+                                    //console.log("entered 60+ loop");
                                     hddBlock = sessionStorage.getItem(tempLoc);
 
                                     var tempData = dataString.substr(0, 60);
@@ -955,7 +954,7 @@ var TSOS;
                 for (var b = 0; b < 8; b++) {
                     var hddBlock = sessionStorage.getItem('' + t + s + b);
                     if (hddBlock.charAt(0) === '0') {
-                        console.log("" + t + s + b);
+                        //console.log("" + t + s + b);
                         return "" + t + s + b;
                     }
                 }
