@@ -237,20 +237,23 @@ var TSOS;
 
                         if ((s === 7) && (b === 7) && !fileNameFound) {
                             writeFailure = true;
-                            console.log("file not found");
+
                             break;
                         }
 
                         var tempFileName = this.convertHexToString(hddBlock.substr(4, fileName.length * 2));
                         if (fileName === tempFileName) {
                             fileNameFound = true;
+                            _krnHDDDriver.deleteFile(fileName, 'krn');
 
                             //thisLoc = "" + t + s + b;
                             //console.log("file match found");
-                            if (hddBlock.substr(1, 3) !== '&&&')
-                                var tempLoc = hddBlock.substr(1, 3);
-                            else
-                                var tempLoc = this.findNextEmptyBlock();
+                            var tempLoc = this.findNextEmptyBlock();
+
+                            //if (hddBlock.substr(1, 3) !== '&&&')
+                            //var tempLoc = hddBlock.substr(1, 3);
+                            //else
+                            //var tempLoc:string = this.findNextEmptyBlock();
                             thisLoc = tempLoc;
                             if (tempLoc !== '&&&') {
                                 sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4));
@@ -262,17 +265,15 @@ var TSOS;
 
                                     var tempData = dataString.substr(0, 60);
                                     dataString = dataString.substr(60);
-                                    thisLoc = tempLoc;
+                                    sessionStorage.setItem(thisLoc, '1' + tempLoc + tempData);
                                     if (dataString.length > 0)
-                                        if (hddBlock.substr(1, 3) !== '&&&')
-                                            tempLoc = hddBlock.substr(1, 3);
-                                        else
-                                            tempLoc = this.findNextEmptyBlock();
+                                        tempLoc = this.findNextEmptyBlock();
                                     else
                                         tempLoc = '&&&';
                                     if (access !== 'krn')
                                         tempData = this.convertStringToHex(tempData);
                                     sessionStorage.setItem(thisLoc, '1' + tempLoc + tempData);
+                                    thisLoc = tempLoc;
                                 }
 
                                 if ((dataString.length > 0) && (tempLoc === '&&&')) {
