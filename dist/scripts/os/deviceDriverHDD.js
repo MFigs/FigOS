@@ -31,6 +31,7 @@ var TSOS;
             sessionStorage.setItem("000", '1&&&************************************************************************************************************************');
 
             _StdOut.putText("HDD Formatted Successfully");
+            _Display.updateHDD();
         };
 
         DeviceDriverHDD.prototype.readFile = function (fileName, access) {
@@ -114,6 +115,8 @@ var TSOS;
                 _TempSwapFileData = data;
             } else
                 _StdOut.putText(this.convertHexToString(data));
+
+            _Display.updateHDD();
         };
 
         DeviceDriverHDD.prototype.deleteFile = function (fileName, access) {
@@ -172,7 +175,10 @@ var TSOS;
                         }
                     }
 
-                    _StdOut.putText("File " + fileName + " Deleted From Disk");
+                    if (access !== "krn")
+                        _StdOut.putText("File " + fileName + " Deleted From Disk");
+
+                    _Display.updateHDD();
                 }
             }
         };
@@ -202,8 +208,11 @@ var TSOS;
                 }
 
                 sessionStorage.setItem(fileLoc, '1&&&' + storeString);
-                _StdOut.putText("File " + fn + " Created On Disk");
+                if (access !== "krn")
+                    _StdOut.putText("File " + fn + " Created On Disk");
             }
+
+            _Display.updateHDD();
         };
 
         DeviceDriverHDD.prototype.writeFile = function (fileName, dataString, access) {
@@ -234,7 +243,7 @@ var TSOS;
                             fileNameFound = true;
 
                             //thisLoc = "" + t + s + b;
-                            console.log("file match found");
+                            //console.log("file match found");
                             if (hddBlock.substr(1, 3) !== '&&&')
                                 var tempLoc = hddBlock.substr(1, 3);
                             else
@@ -243,9 +252,6 @@ var TSOS;
                             if (tempLoc !== '&&&') {
                                 sessionStorage.setItem(t + s + b, hddBlock.charAt(0) + tempLoc + hddBlock.substr(4));
 
-                                //this.clearOldData(tempLoc);
-                                //hddBlock = sessionStorage.getItem(tempLoc);
-                                console.log(dataString.length + "");
                                 while ((dataString.length >= 60) && (tempLoc !== '&&&')) {
                                     console.log("entered 60+ loop");
 
@@ -267,7 +273,7 @@ var TSOS;
 
                                 if ((dataString.length > 0) && (tempLoc === '&&&')) {
                                     //_StdOut.putText('ERROR: MEMORY FULL... PLEASE CLEAR MEMORY');
-                                    console.log("len > 0 but tempLoc == &&&");
+                                    //console.log("len > 0 but tempLoc == &&&");
                                     writeFailure = true;
                                 } else if ((dataString.length > 0) && (tempLoc !== '&&&') && !writeFailure) {
                                     var lastData = '';
@@ -281,12 +287,13 @@ var TSOS;
                                     }
 
                                     sessionStorage.setItem(thisLoc, '1&&&' + lastData);
-                                    console.log("last data written");
+
+                                    //console.log("last data written");
                                     writeSuccess = true;
                                 }
                             } else {
                                 //_StdOut.putText('ERROR: MEMORY FULL... PLEASE CLEAR MEMORY');
-                                console.log("no space found to write");
+                                //console.log("no space found to write");
                                 writeFailure = true;
                             }
                         }
@@ -303,10 +310,12 @@ var TSOS;
                         break;
                 }
 
-                if (writeSuccess)
+                if (writeSuccess || (access !== "krn"))
                     _StdOut.putText("File Written");
                 else if (writeFailure)
                     _StdOut.putText("Error: Memory Full... File Not Written");
+
+                _Display.updateHDD();
             }
         };
 

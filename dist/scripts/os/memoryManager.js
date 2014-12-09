@@ -19,6 +19,27 @@ var TSOS;
             }
         };
 
+        MemoryManager.prototype.clearMemBlock = function (blockNumber) {
+            var base = blockNumber * _MemBlockSize;
+            var lim = base + _MemBlockSize - 1;
+
+            for (var r = base; r <= lim; r++) {
+                _MemoryArray.mem[r] = '00';
+            }
+        };
+
+        MemoryManager.prototype.loadMemBlock = function (blockNumber) {
+            var base = blockNumber * _MemBlockSize;
+            var lim = base + _MemBlockSize - 1;
+            var output = "";
+
+            for (var s = base; s <= lim; s++) {
+                output = output + _MemoryArray.mem[s];
+            }
+
+            return output;
+        };
+
         MemoryManager.prototype.clearMem = function () {
             _MemoryArray.clearMem();
             for (var i = 0; i < 3; i++)

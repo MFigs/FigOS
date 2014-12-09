@@ -38,17 +38,33 @@ module TSOS {
             if (!_ReadyQueue.isEmpty()) {
 
                 var oldPCB: TSOS.ProcessControlBlock = _PCBArray[_CPU.currentPID];
+                var currMemBlock = _CurrentMemBlock;
+
+                var currPCB: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
+
+                if (currPCB.swapFileName !== "") {
+
+                    _krnHDDDriver.readFile(currPCB.swapFileName, "krn");
+                    var stringToDisk: string = _Kernel.memManager.loadMemBlock(currMemBlock);
+                    _Kernel.memManager.clearMemBlock(currMemBlock);
+                    _Kernel.memManager.loadMem(currMemBlock, _TempSwapFileData);
+                    currPCB.updateLoc();
+                    oldPCB.swapFileName = currPCB.swapFileName;
+                    oldPCB.updateLoc();
+                    currPCB.swapFileName = "";
+
+                    _ResidentPCBList[_CPU.currentPID] = 4;
+                    _ResidentPCBList[currPCB.PID] = currMemBlock + 1;
+
+                    _krnHDDDriver.writeFile(oldPCB.swapFileName, stringToDisk, "krn");
+
+                    console.log("PROC " + oldPCB.PID + " MOVED TO DISK; PROC " + currPCB.PID + " MOVED TO MEM BLOCK " + currMemBlock);
+
+
+                }
 
                 _PCBArray[_CPU.currentPID].procStatus = "Ready";
                 _ReadyQueue.enqueue(_PCBArray[_CPU.currentPID]);
-                var currPCB: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
-
-                /*while (_TerminatedProcessList[currPCB.PID] === 1) {
-
-                    currPCB.procStatus = "Terminated";
-                    currPCB = _ReadyQueue.dequeue();
-
-                }*/
 
                 _CurrentMemBlock =_ResidentPCBList[currPCB.PID] - 1;
                 currPCB.quantumCycleCount = 0;
@@ -77,16 +93,23 @@ module TSOS {
                 _ProcessScheduler.programCount -= 1;
                 var currPCB: TSOS.ProcessControlBlock = _ReadyQueue.dequeue();
 
-                /*while (_TerminatedProcessList[currPCB.PID] === 1) {
+                if (currPCB.swapFileName !== "") {
 
-                    if (_ReadyQueue.isEmpty())
-                        _CPU.isExecuting = false;
+                    var currMemBlock: number = _CurrentMemBlock;
+                    _krnHDDDriver.readFile(currPCB.swapFileName, "krn");
+                    _Kernel.memManager.clearMemBlock(currMemBlock);
+                    _Kernel.memManager.loadMem(currMemBlock, _TempSwapFileData);
+                    currPCB.updateLoc();
+                    currPCB.swapFileName = "";
 
-                    currPCB.procStatus = "Terminated";
-                    currPCB = _ReadyQueue.dequeue();
+                    _ResidentPCBList[currPCB.PID] = currMemBlock + 1;
 
 
-                }*/
+                    console.log("PROC " + currPCB.PID + " MOVED TO MEM BLOCK " + currMemBlock);
+
+                }
+
+
 
                 _CurrentMemBlock =_ResidentPCBList[currPCB.PID] - 1;
                 currPCB.quantumCycleCount = 0;

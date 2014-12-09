@@ -4,6 +4,7 @@ var TSOS;
         function Display() {
             this.displayCPU();
             this.displayRQ();
+            this.displayHDD();
         }
         Display.prototype.displayCPU = function () {
             var cDiv = document.getElementById("divCPUTable");
@@ -264,9 +265,52 @@ var TSOS;
         };
 
         Display.prototype.displayHDD = function () {
+            var hTable = document.getElementById("hddTable");
+            var hTBody = document.createElement('TBODY');
+            hTBody.setAttribute('id', "htb");
+
+            for (var t = 0; t < 4; t++) {
+                for (var s = 0; s < 8; s++) {
+                    for (var b = 0; b < 8; b++) {
+                        var hddBlock = sessionStorage.getItem("" + t + s + b);
+                        var trRow = document.createElement('tr');
+                        trRow.setAttribute('id', "trdh" + t + s + b);
+                        var trDataHDD = document.createTextNode(t + ":" + s + ":" + b + " || " + hddBlock.charAt(0) + hddBlock.charAt(1) + hddBlock.charAt(2) + hddBlock.charAt(3) + " || " + hddBlock.substr(4));
+                        var trDataD = document.createElement('td');
+                        trDataD.appendChild(trDataHDD);
+                        trRow.appendChild(trDataD);
+                        hTBody.appendChild(trRow);
+                    }
+                }
+            }
+
+            hTable.appendChild(hTBody);
         };
 
         Display.prototype.updateHDD = function () {
+            var hTbody = document.getElementById("htb");
+            hTbody.parentNode.removeChild(hTbody);
+
+            var hTable = document.getElementById("hddTable");
+            var hTBody = document.createElement('TBODY');
+            hTBody.setAttribute('id', "htb");
+
+            for (var t = 0; t < 4; t++) {
+                for (var s = 0; s < 8; s++) {
+                    for (var b = 0; b < 8; b++) {
+                        var hddBlock = sessionStorage.getItem("" + t + s + b);
+                        var trRow = document.createElement('tr');
+                        trRow.setAttribute('id', "trdh" + t + s + b);
+                        var trDataHDD = document.createTextNode(t + ":" + s + ":" + b + " || " + hddBlock.charAt(0) + hddBlock.charAt(1) + hddBlock.charAt(2) + hddBlock.charAt(3) + " || " + hddBlock.substr(4));
+                        var trDataD = document.createElement('td');
+                        trDataD.appendChild(trDataHDD);
+                        trRow.appendChild(trDataD);
+                        hTBody.appendChild(trRow);
+                    }
+                }
+            }
+
+            hTable.appendChild(hTBody);
         };
         return Display;
     })();

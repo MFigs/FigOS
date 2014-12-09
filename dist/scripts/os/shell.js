@@ -424,7 +424,13 @@ var TSOS;
                 //_StdOut.putText("Memory is Full... Please Clear Memory and Load Program Again...");
                 _krnHDDDriver.createFile(".swap" + _SwapFileCounter, "krn");
                 _krnHDDDriver.writeFile(".swap" + _SwapFileCounter, programStr, "krn");
+                var diskPCB = new TSOS.ProcessControlBlock();
+                diskPCB.swapFileName = ".swap" + _SwapFileCounter;
                 _SwapFileCounter++;
+
+                _ResidentPCBList[diskPCB.PID] = 4;
+                _PCBArray[diskPCB.PID] = diskPCB;
+                _TerminatedProcessList[diskPCB.PID] = 0;
             } else {
                 var prevMemBlock = _CurrentMemBlock;
 
@@ -590,7 +596,23 @@ var TSOS;
         };
 
         Shell.prototype.shellWrite = function (args) {
-            _krnHDDDriver.writeFile(args[0], args[1], "user");
+            if (args[1].charAt(0) === "\"") {
+                var writeString = "" + args[1].substr(1) + " ";
+                var i = 2;
+                var argum = args[i];
+                while (argum.indexOf("\"") === -1) {
+                    writeString = writeString + argum + " ";
+                    i++;
+                    argum = args[i];
+                }
+
+                argum = argum.slice(0, argum.length - 1);
+
+                writeString = writeString + argum;
+
+                //console.log(writeString);
+                _krnHDDDriver.writeFile(args[0], writeString, "user");
+            }
         };
 
         Shell.prototype.shellDelete = function (args) {

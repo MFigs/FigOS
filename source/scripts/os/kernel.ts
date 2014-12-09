@@ -260,6 +260,7 @@ module TSOS {
             this.memManager.updateMem();
             _Display.updateCPU();
             _Display.updateRQ();
+            _Display.updateHDD();
         }
 
     }

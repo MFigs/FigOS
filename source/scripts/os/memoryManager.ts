@@ -28,6 +28,31 @@ module TSOS {
 
         }
 
+        public clearMemBlock(blockNumber: number) {
+
+            var base: number = blockNumber * _MemBlockSize;
+            var lim: number = base + _MemBlockSize - 1;
+
+            for (var r = base; r <= lim; r++) {
+                _MemoryArray.mem[r] = '00';
+            }
+
+        }
+
+        public loadMemBlock(blockNumber: number): string {
+
+            var base: number = blockNumber * _MemBlockSize;
+            var lim: number = base + _MemBlockSize - 1;
+            var output: string = "";
+
+            for (var s = base; s <= lim; s++) {
+                output = output + _MemoryArray.mem[s];
+            }
+
+            return output;
+
+        }
+
         public clearMem(): void {
             _MemoryArray.clearMem();
             for (var i = 0; i < 3; i++)
