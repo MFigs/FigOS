@@ -37,6 +37,8 @@ module TSOS {
                 _MemoryArray.mem[r] = '00';
             }
 
+            _MemLoadedTable[blockNumber] = 0;
+
         }
 
         public loadMemBlock(blockNumber: number): string {
@@ -49,6 +51,8 @@ module TSOS {
                 output = output + _MemoryArray.mem[s];
             }
 
+            _MemLoadedTable[blockNumber] = 1;
+
             return output;
 
         }
@@ -57,8 +61,10 @@ module TSOS {
             _MemoryArray.clearMem();
             for (var i = 0; i < 3; i++)
                 _MemLoadedTable[i] = 0;
-            for (var j = 0; j < _ResidentPCBList.length; j++)
-                _ResidentPCBList[j] = 0;
+            for (var j = 0; j < _ResidentPCBList.length; j++) {
+                if (_ResidentPCBList[j] !== 4)
+                    _ResidentPCBList[j] = 0;
+            }
         }
 
         public storeMem(relativeAddress: number, valueToStore: string): void {

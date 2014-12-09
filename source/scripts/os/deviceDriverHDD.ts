@@ -403,7 +403,7 @@ module TSOS {
                 }
 
 
-                if (writeSuccess || (access !== "krn"))
+                if (writeSuccess && (access !== "krn"))
                     _StdOut.putText("File Written");
 
                 else if (writeFailure)

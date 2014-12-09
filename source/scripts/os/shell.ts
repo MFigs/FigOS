@@ -477,7 +477,7 @@ module TSOS {
         }
 
 
-        public shellLoad(param: number) {
+        public shellLoad(args) {
 
             var programTextElem = <HTMLInputElement> document.getElementById("taProgramInput");
             var programStr:string = programTextElem.value.toString();
@@ -491,6 +491,8 @@ module TSOS {
                 var diskPCB = new ProcessControlBlock();
                 diskPCB.swapFileName = ".swap" + _SwapFileCounter;
                 _SwapFileCounter++;
+                _StdOut.putText("Loaded Program: PID " + diskPCB.PID + " To Disk");
+
 
                 _ResidentPCBList[diskPCB.PID] = 4;
                 _PCBArray[diskPCB.PID] = diskPCB;
@@ -535,7 +537,7 @@ module TSOS {
                             var pcb = new ProcessControlBlock();
 
                             if(arguments.length === 1)
-                                pcb.priority = param;
+                                pcb.priority = args[0];
 
                             _PCBArray[pcb.PID] = pcb;
                             _ResidentPCBList[pcb.PID] = _CurrentMemBlock + 1;
@@ -637,7 +639,7 @@ module TSOS {
             var minActivePID: number = 999;
 
             for (var j: number = 0; j < _ResidentPCBList.length; j++) {
-                if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3)) {
+                if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3) || (_ResidentPCBList[j] === 4)) {
                     _PCBArray[j].updateStatus("Ready");
                     _PCBArray[j].updateLoc();
                     _ReadyQueue.enqueue(_PCBArray[j]);

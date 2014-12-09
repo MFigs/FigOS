@@ -415,7 +415,7 @@ var TSOS;
             }
         };
 
-        Shell.prototype.shellLoad = function (param) {
+        Shell.prototype.shellLoad = function (args) {
             var programTextElem = document.getElementById("taProgramInput");
             var programStr = programTextElem.value.toString();
             programStr = programStr.replace(/\s/g, "");
@@ -427,6 +427,7 @@ var TSOS;
                 var diskPCB = new TSOS.ProcessControlBlock();
                 diskPCB.swapFileName = ".swap" + _SwapFileCounter;
                 _SwapFileCounter++;
+                _StdOut.putText("Loaded Program: PID " + diskPCB.PID + " To Disk");
 
                 _ResidentPCBList[diskPCB.PID] = 4;
                 _PCBArray[diskPCB.PID] = diskPCB;
@@ -462,7 +463,7 @@ var TSOS;
                             var pcb = new TSOS.ProcessControlBlock();
 
                             if (arguments.length === 1)
-                                pcb.priority = param;
+                                pcb.priority = args[0];
 
                             _PCBArray[pcb.PID] = pcb;
                             _ResidentPCBList[pcb.PID] = _CurrentMemBlock + 1;
@@ -544,7 +545,7 @@ var TSOS;
             var minActivePID = 999;
 
             for (var j = 0; j < _ResidentPCBList.length; j++) {
-                if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3)) {
+                if ((_ResidentPCBList[j] === 1) || (_ResidentPCBList[j] === 2) || (_ResidentPCBList[j] === 3) || (_ResidentPCBList[j] === 4)) {
                     _PCBArray[j].updateStatus("Ready");
                     _PCBArray[j].updateLoc();
                     _ReadyQueue.enqueue(_PCBArray[j]);

@@ -320,7 +320,7 @@ var TSOS;
                         break;
                 }
 
-                if (writeSuccess || (access !== "krn"))
+                if (writeSuccess && (access !== "krn"))
                     _StdOut.putText("File Written");
                 else if (writeFailure)
                     _StdOut.putText("Error: Memory Full... File Not Written");
