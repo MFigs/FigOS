@@ -638,6 +638,7 @@ var TSOS;
                     }
                 }
                 _ProcessScheduler.scheduleAlgorithm = 0;
+                _Quantum = 6;
             } else if (scheduleAlgorithm == "fcfs") {
                 if ((_ProcessScheduler.scheduleAlgorithm) !== 0 || (_ProcessScheduler.scheduleAlgorithm !== 1)) {
                     if (_ReadyQueue.isEmpty())
