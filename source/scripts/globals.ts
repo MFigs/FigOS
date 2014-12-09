@@ -23,6 +23,8 @@ var KEYBOARD_IRQ: number = 1;
 
 var TIMER_KILL_ACTIVE_IRQ: number = 2;
 
+var USER_PROCESS_KILL_IRQ: number = 3;
+
 
 //
 // Global Variables

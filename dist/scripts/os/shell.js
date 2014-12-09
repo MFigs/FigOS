@@ -522,15 +522,7 @@ var TSOS;
         };
 
         Shell.prototype.shellKill = function (pid) {
-            if (_CPU.currentPID === pid) {
-                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
-                _PCBArray[pid].procStatus = "Terminated";
-                _TerminatedProcessList[pid] = 1;
-            } else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3) && (_ResidentPCBList[pid] !== 4)) {
-                _StdOut.putText("Invalid Process ID specified in kill command...");
-            } else {
-                _TerminatedProcessList[pid] = 1;
-            }
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(USER_PROCESS_KILL_IRQ, [pid]));
         };
 
         Shell.prototype.shellKillAll = function () {
@@ -597,18 +589,23 @@ var TSOS;
 
         Shell.prototype.shellWrite = function (args) {
             if (args[1].charAt(0) === "\"") {
-                var writeString = "" + args[1].substr(1) + " ";
+                var writeString = "" + args[1].substr(1);
+                if (writeString.indexOf("\"") !== -1) {
+                    writeString = writeString.slice(0, writeString.length - 1);
+                    _krnHDDDriver.writeFile(args[0], writeString, "user");
+                    return;
+                }
                 var i = 2;
                 var argum = args[i];
                 while (argum.indexOf("\"") === -1) {
-                    writeString = writeString + argum + " ";
+                    writeString = writeString + " " + argum;
                     i++;
                     argum = args[i];
                 }
 
                 argum = argum.slice(0, argum.length - 1);
 
-                writeString = writeString + argum;
+                writeString = writeString + " " + argum;
 
                 //console.log(writeString);
                 _krnHDDDriver.writeFile(args[0], writeString, "user");

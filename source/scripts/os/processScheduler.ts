@@ -123,6 +123,14 @@ module TSOS {
 
                 _PCBArray[_CPU.currentPID].procStatus = "Terminated";
                 _CPU.isExecuting = false;
+                for(var i = 0; i < 3; i++) {
+                    _MemLoadedTable[i] = 0;
+                }
+                for (var j = 1; j < _SwapFileCounter; j++) {
+
+                    _krnHDDDriver.deleteFile(".swap" + j, "krn");
+
+                }
 
             }
         }

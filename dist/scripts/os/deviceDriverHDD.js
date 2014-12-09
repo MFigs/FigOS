@@ -228,6 +228,9 @@ var TSOS;
                 var t = "0";
                 var thisLoc;
 
+                if (access === "krn")
+                    fileName = fileName.replace(/ /g, '');
+
                 for (var s = 0; s < 8; s++) {
                     for (var b = 0; b < 8; b++) {
                         var hddBlock = sessionStorage.getItem(t + s + b);
@@ -267,7 +270,8 @@ var TSOS;
                                             tempLoc = this.findNextEmptyBlock();
                                     else
                                         tempLoc = '&&&';
-                                    tempData = this.convertStringToHex(tempData);
+                                    if (access !== 'krn')
+                                        tempData = this.convertStringToHex(tempData);
                                     sessionStorage.setItem(thisLoc, '1' + tempLoc + tempData);
                                 }
 
@@ -280,8 +284,13 @@ var TSOS;
 
                                     for (var j = 0; j < 60; j++) {
                                         if (dataString.length > 0) {
-                                            lastData = lastData + this.charToHex(dataString.charAt(0));
-                                            dataString = dataString.substr(1);
+                                            if (access !== 'krn') {
+                                                lastData = lastData + this.charToHex(dataString.charAt(0));
+                                                dataString = dataString.substr(1);
+                                            } else {
+                                                lastData = lastData + dataString.charAt(0);
+                                                dataString = dataString.substr(1);
+                                            }
                                         } else
                                             lastData = lastData + '~~';
                                     }

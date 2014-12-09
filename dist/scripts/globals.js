@@ -21,6 +21,8 @@ var KEYBOARD_IRQ = 1;
 
 var TIMER_KILL_ACTIVE_IRQ = 2;
 
+var USER_PROCESS_KILL_IRQ = 3;
+
 //
 // Global Variables
 //
