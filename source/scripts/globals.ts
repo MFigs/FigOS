@@ -66,6 +66,7 @@ var _SarcasticMode: boolean = false;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver = null;
+var _krnHDDDriver = null;
 
 var _hardwareClockID: number = null;
 
@@ -103,3 +104,4 @@ var _TerminatedProcessList: number[];
 var _Quantum: number = 6;
 
 var _HDD: TSOS.HardDrive;
+var _SwapFileCounter: number = 1;

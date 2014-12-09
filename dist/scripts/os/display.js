@@ -262,6 +262,12 @@ var TSOS;
 
             rTable.appendChild(rTBody);
         };
+
+        Display.prototype.displayHDD = function () {
+        };
+
+        Display.prototype.updateHDD = function () {
+        };
         return Display;
     })();
     TSOS.Display = Display;

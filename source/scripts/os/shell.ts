@@ -199,6 +199,12 @@ module TSOS {
                 "- Returns the current process scheduling algorithm being used by the operating system.");
             this.commandList[this.commandList.length] = sc;
 
+            //ls
+            sc = new ShellCommand(this.shellLS,
+                "ls",
+                "- Returns a list of all user files currently stored on the hard drive.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -470,7 +476,6 @@ module TSOS {
             }
         }
 
-        // TODO: Fix load function to stop "enter" key from causing program to think hex code is invalid
 
         public shellLoad(param: number) {
 
@@ -480,7 +485,11 @@ module TSOS {
 
             if ((_MemLoadedTable[0] === 1) && (_MemLoadedTable[1] === 1) && (_MemLoadedTable[2] === 1)) {
 
-                _StdOut.putText("Memory is Full... Please Clear Memory and Load Program Again...");
+                //_StdOut.putText("Memory is Full... Please Clear Memory and Load Program Again...");
+                _krnHDDDriver.createFile(".swap" + _SwapFileCounter, "krn");
+                _krnHDDDriver.writeFile(".swap" + _SwapFileCounter, programStr, "krn");
+                _SwapFileCounter++;
+
 
             }
 
@@ -600,7 +609,7 @@ module TSOS {
                _PCBArray[pid].procStatus = "Terminated";
                 _TerminatedProcessList[pid] = 1;
             }
-            else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3)) {
+            else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3) && (_ResidentPCBList[pid] !== 4)) {
                 _StdOut.putText("Invalid Process ID specified in kill command...");
             }
             else {
@@ -677,31 +686,31 @@ module TSOS {
 
         public shellCreate(args) {
 
-            _HDD.createFile(args[0]);
+            _krnHDDDriver.createFile(args[0], "user");
 
         }
 
         public shellRead(args) {
 
-            _HDD.readFile(args[0]);
+            _krnHDDDriver.readFile(args[0], "user");
 
         }
 
         public shellWrite(args) {
 
-            _HDD.writeFile(args[0], args[1]);
+            _krnHDDDriver.writeFile(args[0], args[1], "user");
 
         }
 
         public shellDelete(args) {
 
-            _HDD.deleteFile(args[0]);
+            _krnHDDDriver.deleteFile(args[0], "user");
 
         }
 
         public shellFormat() {
 
-            _HDD.formatHDD();
+            _krnHDDDriver.formatHDD();
 
         }
 
@@ -752,6 +761,37 @@ module TSOS {
             }
             else
                 _StdOut.putText("Error: Invalid Scheduling Algorithm Specified... select \"rr\", \"fcfs\", or \"priority\"...");
+
+        }
+
+        public shellLS(args) {
+
+            _StdOut.putText("File List:");
+            _StdOut.advanceLine();
+            var t: string = '0';
+            for (var s = 0; s < 8; s++) {
+                for (var b = 0; b < 8; b++) {
+                    var hddBlock: string = sessionStorage.getItem("" + t + s + b);
+                    if ((hddBlock.charAt(0) === "1") && (("" + t + s + b) !== "000")) {
+                        if (hddBlock.substr(4,2) !== "2E") {
+                            var tempFileName = hddBlock.substr(4);
+                            //var star = "*", re = new RegExp(star, "g");
+                            //tempFileName = tempFileName.replace(re, "");
+                            var ch: string = tempFileName.charAt(0);
+                            var tempFileName2: string = "";
+                            while (ch !== "*") {
+                                tempFileName2 = tempFileName2 + ch;
+                                tempFileName = tempFileName.substr(1);
+                                ch = tempFileName.charAt(0);
+                            }
+                            tempFileName2 = _krnHDDDriver.convertHexToString(tempFileName2);
+                            //console.log(tempFileName2);
+                            _StdOut.putText(tempFileName2);
+                            _StdOut.advanceLine();
+                        }
+                    }
+                }
+            }
 
         }
 

@@ -80,6 +80,12 @@ var TSOS;
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
 
+            // Load the HDD Devide Driver
+            this.krnTrace("Loading the HDD device driver.");
+            _krnHDDDriver = new TSOS.DeviceDriverHDD();
+            _krnHDDDriver.krnHDDDriverEntry(); // Call the driverEntry() initialization routine.
+            this.krnTrace(_krnHDDDriver.status);
+
             //
             // ... more?
             //
