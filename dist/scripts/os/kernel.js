@@ -199,26 +199,28 @@ var TSOS;
         };
 
         Kernel.prototype.krnProcessKillISR = function (params) {
-            console.log("Entered Kill Process ISR");
+            //console.log("Entered Kill Process ISR");
             var pid = params[0];
-            console.log("PARAM: " + pid);
-            if (_CPU.currentPID === pid) {
-                console.log("Current Process Ended");
+
+            //console.log("PARAM: " + pid);
+            if (_CPU.currentPID == pid) {
+                //console.log("Current Process Ended");
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(TIMER_KILL_ACTIVE_IRQ, null));
                 _PCBArray[pid].procStatus = "Terminated";
                 _TerminatedProcessList[pid] = 1;
-            } else if ((_ResidentPCBList[pid] !== 1) && (_ResidentPCBList[pid] !== 2) && (_ResidentPCBList[pid] !== 3) && (_ResidentPCBList[pid] !== 4)) {
+            } else if ((_ResidentPCBList[pid] != 1) && (_ResidentPCBList[pid] != 2) && (_ResidentPCBList[pid] != 3) && (_ResidentPCBList[pid] != 4)) {
                 _StdOut.putText("Invalid Process ID specified in kill command...");
             } else {
                 _TerminatedProcessList[pid] = 1;
                 for (var i = 0; i < _ReadyQueue.getSize(); i++) {
                     var temp = _ReadyQueue.q[i];
-                    console.log("PID 1: " + temp.PID + "   PID 2: " + pid);
-                    console.log(temp.PID == pid);
+
+                    //console.log("PID 1: " + temp.PID + "   PID 2: " + pid);
+                    //console.log(temp.PID == pid);
                     if (temp.PID == pid) {
-                        console.log(_ReadyQueue.q.length);
+                        //console.log(_ReadyQueue.q.length);
                         _ReadyQueue.q.splice(i, 1);
-                        console.log(_ReadyQueue.q.length);
+                        //console.log(_ReadyQueue.q.length);
                     }
                 }
             }
